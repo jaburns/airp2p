@@ -26,7 +26,7 @@ package
             _tf = new TextField;
             _tf.y = 100;
             _tf.width = stage.stageWidth;
-            _tf.height = stage.stageHeight - 100;
+            _tf.height = 9000;
             addChild(_tf);
 
             stage.addEventListener(MouseEvent.CLICK, stage_click);
