@@ -143,12 +143,14 @@ package net.jaburns.airp2p
             if (commit) {
                 if (index < 0) {
                     _committedPeerIPs.push(ip);
+                    _log(ip + " is committing to match");
                     dispatchEvent(new P2PEvent(P2PEvent.PEER_COMMITTED, ip));
                     checkAllCommitted();
                 }
             }
             else if (index >= 0) {
                 _committedPeerIPs.splice(index, 1);
+                _log(ip + " is no longer committed to match");
                 dispatchEvent(new P2PEvent(P2PEvent.PEER_UNCOMMITTED, ip));
             }
         }
@@ -156,6 +158,7 @@ package net.jaburns.airp2p
         private function checkAllCommitted() :void
         {
             if (getIPs().length === _committedPeerIPs.length) {
+                _log("Everyone in the lobby has committed to a match!");
                 dispatchEvent(new P2PEvent(P2PEvent.LOBBY_COMPLETE, null));
             }
         }
@@ -164,6 +167,7 @@ package net.jaburns.airp2p
         {
             if (_peerIPs[id] !== ip) {
                 _peerIPs[id] = ip;
+                _log(ip + " has connected to lobby");
                 dispatchEvent(new P2PEvent(P2PEvent.PEER_CONNECTED, ip));
             }
         }
@@ -173,6 +177,7 @@ package net.jaburns.airp2p
             if (_peerIPs[id]) {
                 var deadIP:String = _peerIPs[id];
                 delete _peerIPs[id];
+                _log(ip + " has left the lobby");
                 dispatchEvent(new P2PEvent(P2PEvent.PEER_DISCONNECTED, deadIP));
             }
         }

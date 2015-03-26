@@ -46,7 +46,6 @@ package
 
         private function stage_click(e:*) :void
         {
-            log("hi");
             if (_lobby.committed) {
                 _lobby.uncommit();
             } else {
@@ -56,27 +55,22 @@ package
 
         private function peerConnect(e:P2PEvent) :void
         {
-            log("Joined lobby: "+e.data);
         }
 
         private function peerDisconnect(e:P2PEvent) :void
         {
-            log("Left lobby: "+e.data);
         }
 
         private function peerCommit(e:P2PEvent) :void
         {
-            log("Committed to match: "+e.data);
         }
 
         private function peerUncommit(e:P2PEvent) :void
         {
-            log("Left match: "+e.data);
         }
 
         private function lobbyComplete(e:P2PEvent) :void
         {
-            log("Everyone's in! Starting match!");
         }
     }
 }
