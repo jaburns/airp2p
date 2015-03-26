@@ -3,13 +3,10 @@ package
     import flash.display.Sprite;
     import flash.display.StageAlign;
     import flash.display.StageScaleMode;
-    import flash.events.Event;
     import flash.text.TextField;
-    import flash.text.TextFormat;
 
     import net.jaburns.airp2p.Lobby;
-
-    //import net.jaburns.airp2p.LANAddress;
+    import net.jaburns.airp2p.P2PEvent;
 
     public class Main extends Sprite
     {
@@ -20,7 +17,6 @@ package
         {
             super();
 
-            // support autoOrients
             stage.align = StageAlign.TOP_LEFT;
             stage.scaleMode = StageScaleMode.NO_SCALE;
 
@@ -30,9 +26,9 @@ package
             _tf.height = stage.stageHeight - 100;
             addChild(_tf);
 
-            _lobby = new Lobby(log);
-            _lobby.addEventListener(Lobby.EVENT_PEER_CONNECTED, peersChanged);
-            _lobby.addEventListener(Lobby.EVENT_PEER_DISCONNECTED, peersChanged);
+            _lobby = new Lobby(/*log*/);
+            _lobby.addEventListener(P2PEvent.PEER_CONNECTED, peerConnect);
+            _lobby.addEventListener(P2PEvent.PEER_DISCONNECTED, peerDisconnect);
             _lobby.connect();
         }
 
@@ -42,10 +38,14 @@ package
             _tf.appendText("\n");
         }
 
-        private function peersChanged(e:Event) :void
+        private function peerConnect(e:P2PEvent) :void
         {
-            log("Lobby:");
-            log(JSON.stringify(_lobby.getIPs()));
+            log("Joined lobby: "+e.data);
+        }
+
+        private function peerDisconnect(e:P2PEvent) :void
+        {
+            log("Left lobby: "+e.data);
         }
     }
 }

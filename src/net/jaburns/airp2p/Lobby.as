@@ -11,9 +11,6 @@ package net.jaburns.airp2p
 
     public class Lobby extends EventDispatcher
     {
-        static public const EVENT_PEER_CONNECTED :String = "peerConnected";
-        static public const EVENT_PEER_DISCONNECTED :String = "peerDisconnected";
-
         static private const GROUP_NAME :String = "airp2p/localgroup";
         static private const MULTICAST_ADDRESS :String = "225.225.0.1";
         static private const MULTICAST_PORT :String = "30321";
@@ -109,15 +106,16 @@ package net.jaburns.airp2p
         {
             if (_peerIPs[id] !== ip) {
                 _peerIPs[id] = ip;
-                dispatchEvent(new Event(EVENT_PEER_CONNECTED));
+                dispatchEvent(new P2PEvent(P2PEvent.PEER_CONNECTED, ip));
             }
         }
 
         private function deletePeer(id:String) :void
         {
             if (_peerIPs[id]) {
+                var deadIP:String = _peerIPs[id];
                 delete _peerIPs[id];
-                dispatchEvent(new Event(EVENT_PEER_DISCONNECTED));
+                dispatchEvent(new P2PEvent(P2PEvent.PEER_DISCONNECTED, deadIP));
             }
         }
 

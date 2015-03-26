@@ -45,15 +45,24 @@ package net.jaburns.airp2p
 
         static private function findLocalIP(ips:Vector.<String>) :String
         {
-            // Local network IP address ranges
-            //    Class A    10.  0.0.0 -  10.255.255.255
-            //    Class B   172. 16.0.0 - 172. 31.255.255
-            //    Class C   192.168.0.0 - 192.168.255.255
+            var classB :String = null;
+            var classC :String = null;
 
+            // Check for standard class B and C subnet IPs in the interface stack.
             for each (var ip:String in ips) {
-                if (ip.indexOf("192.168") === 0) return ip;
+                if (ip.indexOf("192.168.") === 0) {
+                    classC = ip;
+                }
+                else if (ip.indexOf("172.") === 0) {
+                    var secondByte:int = parseInt(ip.substr(4,ip.substr(4).indexOf('.')));
+                    if (secondByte >= 16 && secondByte <= 31) {
+                        classB = ip;
+                    }
+                }
             }
-            return null;
+
+            if (classC) return classC;
+            return classB;
         }
     }
 }
