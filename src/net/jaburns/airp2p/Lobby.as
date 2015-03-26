@@ -25,6 +25,8 @@ package net.jaburns.airp2p
         private var _peerIPs :Object = {};
         private var _committedPeerIPs :Vector.<String> = new <String> [];
 
+        private var _matchBuilder :MatchBuilder;
+
 
         public function get ip () :String { return _ip; }
         public function get committed() :Boolean { return _committedPeerIPs.indexOf(_ip) >= 0; }
@@ -32,6 +34,8 @@ package net.jaburns.airp2p
 
         public function Lobby(log:Function=null)
         {
+            _matchBuilder = new MatchBuilder(log);
+
             if (log !== null) {
                 _log = function(msg:String) :void {
                     log("[com.jaburns.airp2p.Lobby] "+msg);
@@ -48,9 +52,11 @@ package net.jaburns.airp2p
                 throw new Error("Could not determine IP adress on local network.");
             }
 
-            _netConn = new NetConnection();
+            _netConn = new NetConnection;
             _netConn.addEventListener(NetStatusEvent.NET_STATUS, netStatus);
             _netConn.connect("rtmfp:");
+
+            _matchBuilder.initServerSocket();
 
             _log("IP: "+_ip);
         }
@@ -87,7 +93,16 @@ package net.jaburns.airp2p
 
             switch (e.info.code) {
                 case "NetConnection.Connect.Success":
-                    setupGroup();
+                    var groupspec :GroupSpecifier = new GroupSpecifier(GROUP_NAME);
+                    groupspec.postingEnabled = true;
+                    groupspec.ipMulticastMemberUpdatesEnabled = true;
+
+                    try { // iOS throws an ArgError here for some reason, but doesn't mind if you continue.
+                        groupspec.addIPMulticastAddress(MULTICAST_ADDRESS, MULTICAST_PORT);
+                    } catch (e:ArgumentError) { }
+
+                    _group = new NetGroup(_netConn, groupspec.groupspecWithAuthorizations());
+                    _group.addEventListener(NetStatusEvent.NET_STATUS, netStatus);
                     break;
 
                 case "NetGroup.Connect.Success":
@@ -157,9 +172,12 @@ package net.jaburns.airp2p
 
         private function checkAllCommitted() :void
         {
-            if (getIPs().length === _committedPeerIPs.length) {
+            var ips:Vector.<String> = getIPs();
+
+            if (ips.length === _committedPeerIPs.length) {
                 _log("Everyone in the lobby has committed to a match!");
-                dispatchEvent(new P2PEvent(P2PEvent.LOBBY_COMPLETE, null));
+                var matchFn :Function = _matchBuilder.connect(_ip, ips);
+                dispatchEvent(new P2PEvent(P2PEvent.LOBBY_COMPLETE, matchFn));
             }
         }
 
@@ -180,20 +198,6 @@ package net.jaburns.airp2p
                 _log(ip + " has left the lobby");
                 dispatchEvent(new P2PEvent(P2PEvent.PEER_DISCONNECTED, deadIP));
             }
-        }
-
-        private function setupGroup() :void
-        {
-            var groupspec :GroupSpecifier = new GroupSpecifier(GROUP_NAME);
-            groupspec.postingEnabled = true;
-            groupspec.ipMulticastMemberUpdatesEnabled = true;
-
-            try {
-                groupspec.addIPMulticastAddress(MULTICAST_ADDRESS, MULTICAST_PORT);
-            } catch (e:ArgumentError) { }
-
-            _group = new NetGroup(_netConn, groupspec.groupspecWithAuthorizations());
-            _group.addEventListener(NetStatusEvent.NET_STATUS, netStatus);
         }
     }
 }

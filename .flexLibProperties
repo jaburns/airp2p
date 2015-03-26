@@ -4,6 +4,8 @@
     <classEntry path="net.jaburns.airp2p.Lobby"/>
     <classEntry path="net.jaburns.airp2p.LANAddress"/>
     <classEntry path="net.jaburns.airp2p.P2PEvent"/>
+    <classEntry path="net.jaburns.airp2p.Match"/>
+    <classEntry path="net.jaburns.airp2p.MatchBuilder"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

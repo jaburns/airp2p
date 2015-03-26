@@ -14,6 +14,8 @@ package
         private var _tf :TextField;
         private var _lobby :Lobby;
 
+        private var _clickFunction :Function ;
+
         public function Main()
         {
             super();
@@ -36,6 +38,8 @@ package
             _lobby.addEventListener(P2PEvent.PEER_UNCOMMITTED, peerUncommit);
             _lobby.addEventListener(P2PEvent.LOBBY_COMPLETE, lobbyComplete);
             _lobby.connect();
+
+            _clickFunction = toggleCommit;
         }
 
         private function log(msg:String) :void
@@ -45,6 +49,11 @@ package
         }
 
         private function stage_click(e:*) :void
+        {
+            _clickFunction();
+        }
+
+        private function toggleCommit() :void
         {
             if (_lobby.committed) {
                 _lobby.uncommit();
@@ -71,6 +80,10 @@ package
 
         private function lobbyComplete(e:P2PEvent) :void
         {
+            var f:Function = e.data as Function;
+            _clickFunction = function() :void {
+                f(Math.random().toString());
+            };
         }
     }
 }
