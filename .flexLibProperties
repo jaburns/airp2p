@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<flexLibProperties includeAllClasses="true" useMultiPlatformConfig="false" version="3">
+  <includeClasses>
+    <classEntry path="net.jaburns.airp2p.P2PClient"/>
+    <classEntry path="net.jaburns.airp2p.Lobby"/>
+    <classEntry path="net.jaburns.airp2p.LANAddress"/>
+  </includeClasses>
+  <includeResources/>
+  <namespaceManifests/>
+</flexLibProperties>
