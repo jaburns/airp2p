@@ -3,6 +3,7 @@ package
     import flash.display.Sprite;
     import flash.display.StageAlign;
     import flash.display.StageScaleMode;
+    import flash.events.MouseEvent;
     import flash.text.TextField;
 
     import net.jaburns.airp2p.Lobby;
@@ -26,9 +27,14 @@ package
             _tf.height = stage.stageHeight - 100;
             addChild(_tf);
 
-            _lobby = new Lobby(/*log*/);
+            stage.addEventListener(MouseEvent.CLICK, stage_click);
+
+            _lobby = new Lobby(log);
             _lobby.addEventListener(P2PEvent.PEER_CONNECTED, peerConnect);
             _lobby.addEventListener(P2PEvent.PEER_DISCONNECTED, peerDisconnect);
+            _lobby.addEventListener(P2PEvent.PEER_COMMITTED, peerCommit);
+            _lobby.addEventListener(P2PEvent.PEER_UNCOMMITTED, peerUncommit);
+            _lobby.addEventListener(P2PEvent.LOBBY_COMPLETE, lobbyComplete);
             _lobby.connect();
         }
 
@@ -36,6 +42,16 @@ package
         {
             _tf.appendText(msg);
             _tf.appendText("\n");
+        }
+
+        private function stage_click(e:*) :void
+        {
+            log("hi");
+            if (_lobby.committed) {
+                _lobby.uncommit();
+            } else {
+                _lobby.commit();
+            }
         }
 
         private function peerConnect(e:P2PEvent) :void
@@ -46,6 +62,21 @@ package
         private function peerDisconnect(e:P2PEvent) :void
         {
             log("Left lobby: "+e.data);
+        }
+
+        private function peerCommit(e:P2PEvent) :void
+        {
+            log("Committed to match: "+e.data);
+        }
+
+        private function peerUncommit(e:P2PEvent) :void
+        {
+            log("Left match: "+e.data);
+        }
+
+        private function lobbyComplete(e:P2PEvent) :void
+        {
+            log("Everyone's in! Starting match!");
         }
     }
 }

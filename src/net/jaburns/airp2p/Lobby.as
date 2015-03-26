@@ -1,13 +1,10 @@
 package net.jaburns.airp2p
 {
-    import flash.events.Event;
     import flash.events.EventDispatcher;
     import flash.events.NetStatusEvent;
     import flash.net.GroupSpecifier;
     import flash.net.NetConnection;
     import flash.net.NetGroup;
-
-    // Reference: http://tomkrcha.com/?p=1803
 
     public class Lobby extends EventDispatcher
     {
@@ -25,8 +22,12 @@ package net.jaburns.airp2p
         private var _group :NetGroup = null;
 
         private var _hasSharedIP :Boolean = false;
-        private var _peerCount :int = 0;
         private var _peerIPs :Object = {};
+        private var _committedPeerIPs :Vector.<String> = new <String> [];
+
+
+        public function get ip () :String { return _ip; }
+        public function get committed() :Boolean { return _committedPeerIPs.indexOf(_ip) >= 0; }
 
 
         public function Lobby(log:Function=null)
@@ -54,6 +55,16 @@ package net.jaburns.airp2p
             _log("IP: "+_ip);
         }
 
+        public function commit() :void
+        {
+            setThisCommit(true);
+        }
+
+        public function uncommit() :void
+        {
+            setThisCommit(false);
+        }
+
         public function getIPs() :Vector.<String>
         {
             var ret :Vector.<String> = new <String> [];
@@ -62,6 +73,13 @@ package net.jaburns.airp2p
             }
             return ret;
         }
+
+        public function getCommittedIPs() :Vector.<String>
+        {
+            return _committedPeerIPs.slice();
+        }
+
+    // ========================================================================
 
         private function netStatus(e:NetStatusEvent) :void
         {
@@ -84,10 +102,15 @@ package net.jaburns.airp2p
                     break;
 
                 case "NetGroup.Posting.Notify":
-                    setPeer(e.info.message.id, e.info.message.ip);
-                    if (!_hasSharedIP) {
-                        _hasSharedIP = true;
-                        broadcastSelf();
+                    if (e.info.message.id) {
+                        setPeer(e.info.message.id, e.info.message.ip);
+                        if (!_hasSharedIP) {
+                            _hasSharedIP = true;
+                            broadcastSelf();
+                        }
+                    }
+                    else {
+                        setCommit(e.info.message.ip, e.info.message.commit);
                     }
                     break;
 
@@ -100,6 +123,41 @@ package net.jaburns.airp2p
         private function broadcastSelf() :void
         {
             _group.post({ id:_id, ip:_ip });
+        }
+
+        private function setThisCommit(commit:Boolean) :void
+        {
+            if (!_group) {
+                throw new Error("Lobby is not connected, cannot commit to a match.");
+            }
+
+            // Duplicate messages are ignored, need to add random value to force Notify event.
+            _group.post({ ip:_ip, commit:commit, rand:Math.random() });
+            setCommit(_ip, commit);
+        }
+
+        private function setCommit(ip:String, commit:Boolean) :void
+        {
+            var index:int = _committedPeerIPs.indexOf(ip);
+
+            if (commit) {
+                if (index < 0) {
+                    _committedPeerIPs.push(ip);
+                    dispatchEvent(new P2PEvent(P2PEvent.PEER_COMMITTED, ip));
+                    checkAllCommitted();
+                }
+            }
+            else if (index >= 0) {
+                _committedPeerIPs.splice(index, 1);
+                dispatchEvent(new P2PEvent(P2PEvent.PEER_UNCOMMITTED, ip));
+            }
+        }
+
+        private function checkAllCommitted() :void
+        {
+            if (getIPs().length === _committedPeerIPs.length) {
+                dispatchEvent(new P2PEvent(P2PEvent.LOBBY_COMPLETE, null));
+            }
         }
 
         private function setPeer(id:String, ip:String) :void

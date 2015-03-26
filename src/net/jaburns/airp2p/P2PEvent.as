@@ -6,6 +6,11 @@ package net.jaburns.airp2p
     {
         static public const PEER_CONNECTED :String = "peerConnected";
         static public const PEER_DISCONNECTED :String = "peerDisconnected";
+        static public const PEER_COMMITTED :String = "peerCommitted";
+        static public const PEER_UNCOMMITTED :String = "peerUncommitted";
+
+        static public const LOBBY_COMPLETE :String = "lobbyComplete";
+
 
         public var data:Object = null;
 
