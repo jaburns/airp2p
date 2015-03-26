@@ -1,35 +1,46 @@
 package net.jaburns.airp2p
 {
+    import flash.events.Event;
+    import flash.events.EventDispatcher;
     import flash.events.NetStatusEvent;
     import flash.net.GroupSpecifier;
     import flash.net.NetConnection;
     import flash.net.NetGroup;
 
-    public class Lobby
+    // Reference: http://tomkrcha.com/?p=1803
+
+    public class Lobby extends EventDispatcher
     {
+        static public const EVENT_PEER_CONNECTED :String = "peerConnected";
+        static public const EVENT_PEER_DISCONNECTED :String = "peerDisconnected";
+
         static private const GROUP_NAME :String = "airp2p/localgroup";
         static private const MULTICAST_ADDRESS :String = "225.225.0.1";
         static private const MULTICAST_PORT :String = "30321";
 
-        private var _traceFn :Function;
 
-        private var _ip :String;
-        private var _nc :NetConnection;
-        private var _group :NetGroup;
-        private var _userName :String;
-        private var _hasSharedIP :Boolean;
+        private var _log :Function = null;
 
-        //http://tomkrcha.com/?p=1803
+        private var _id :String = null;
+        private var _ip :String = null;
 
-        public function Lobby(traceFn:Function)
+        private var _netConn :NetConnection = null;
+        private var _group :NetGroup = null;
+
+        private var _hasSharedIP :Boolean = false;
+        private var _peerCount :int = 0;
+        private var _peerIPs :Object = {};
+
+
+        public function Lobby(log:Function=null)
         {
-            _traceFn = traceFn;
-
-            // Connect to local RTMFP group and share IP.
-
-            // Each time someone new connects to the group, broadcast own IP.
-            // When receiving other IPs add them to a list.
-            // Should now have a list of IPs on this LAN which we can make socket connections to.
+            if (log !== null) {
+                _log = function(msg:String) :void {
+                    log("[com.jaburns.airp2p.Lobby] "+msg);
+                };
+            } else {
+                _log = function(msg:String) :void { };
+            }
         }
 
         public function connect() :void
@@ -39,36 +50,74 @@ package net.jaburns.airp2p
                 throw new Error("Could not determine IP adress on local network.");
             }
 
-            _traceFn("Lobby: Local IP is "+_ip);
+            _netConn = new NetConnection();
+            _netConn.addEventListener(NetStatusEvent.NET_STATUS, netStatus);
+            _netConn.connect("rtmfp:");
 
-            _nc = new NetConnection();
-            _nc.addEventListener(NetStatusEvent.NET_STATUS, netStatus);
-            _nc.connect("rtmfp:");
+            _log("IP: "+_ip);
         }
 
-        private function netStatus(event:NetStatusEvent) :void
+        public function getIPs() :Vector.<String>
         {
-            _traceFn("Lobby:NetStatusEvent: "+event.info.code);
+            var ret :Vector.<String> = new <String> [];
+            for (var k:String in _peerIPs) {
+                ret.push(_peerIPs[k]);
+            }
+            return ret;
+        }
 
-            switch (event.info.code) {
+        private function netStatus(e:NetStatusEvent) :void
+        {
+            _log("Status: "+e.info.code);
+
+            switch (e.info.code) {
                 case "NetConnection.Connect.Success":
                     setupGroup();
                     break;
 
+                case "NetGroup.Connect.Success":
+                    _id = _group.convertPeerIDToGroupAddress(_netConn.nearID);
+                    _log("ID: "+_id);
+                    setPeer(_id, _ip);
+                    broadcastSelf();
+                    break;
+
                 case "NetGroup.Neighbor.Connect":
-                    _group.post(_ip);
+                    broadcastSelf();
                     break;
 
                 case "NetGroup.Posting.Notify":
-                    _traceFn("Lobby:MessageReceived: "+event.info.message);
-
+                    setPeer(e.info.message.id, e.info.message.ip);
                     if (!_hasSharedIP) {
                         _hasSharedIP = true;
-                        _group.post(_ip);
+                        broadcastSelf();
                     }
                     break;
 
-                // TODO Handle disconnect and neighbor connection
+                case "NetGroup.Neighbor.Disconnect":
+                    deletePeer(e.info.neighbor);
+                    break;
+            }
+        }
+
+        private function broadcastSelf() :void
+        {
+            _group.post({ id:_id, ip:_ip });
+        }
+
+        private function setPeer(id:String, ip:String) :void
+        {
+            if (_peerIPs[id] !== ip) {
+                _peerIPs[id] = ip;
+                dispatchEvent(new Event(EVENT_PEER_CONNECTED));
+            }
+        }
+
+        private function deletePeer(id:String) :void
+        {
+            if (_peerIPs[id]) {
+                delete _peerIPs[id];
+                dispatchEvent(new Event(EVENT_PEER_DISCONNECTED));
             }
         }
 
@@ -80,13 +129,10 @@ package net.jaburns.airp2p
 
             try {
                 groupspec.addIPMulticastAddress(MULTICAST_ADDRESS, MULTICAST_PORT);
-            } catch (e:ArgumentError) {
-                _traceFn("Caught ArgumentError thrown from addIPMulticastAddress");
-            }
+            } catch (e:ArgumentError) { }
 
-            _group = new NetGroup(_nc, groupspec.groupspecWithAuthorizations());
+            _group = new NetGroup(_netConn, groupspec.groupspecWithAuthorizations());
             _group.addEventListener(NetStatusEvent.NET_STATUS, netStatus);
         }
     }
 }
-
