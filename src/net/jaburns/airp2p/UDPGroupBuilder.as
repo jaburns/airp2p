@@ -37,6 +37,8 @@ package net.jaburns.airp2p
             _outgoingIPs = ips.slice();
             _outgoingIPs.splice(_outgoingIPs.indexOf(thisIP), 1);
 
+            _log("Peer group ready!");
+
             _peerGroup = new PeerGroup;
             _peerGroup.bindBroadcaster(broadcast);
             ready(_peerGroup);
