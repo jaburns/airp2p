@@ -14,6 +14,8 @@ package net.jaburns.airp2p
         private var _serverSocket :ServerSocket;
 
         private var _sockets :Vector.<Socket> = new <Socket> [];
+        private var _socketsExpected :int = -1;
+        private var _connectReady :Function = null;
 
         public function PeerGroupBuilder(log:Function=null)
         {
@@ -29,39 +31,20 @@ package net.jaburns.airp2p
         public function initServerSocket() :void
         {
             _serverSocket = new ServerSocket;
-            _serverSocket.addEventListener(Event.CONNECT, socket_connect);
+            _serverSocket.addEventListener(Event.CONNECT, insocket_connect);
             _serverSocket.bind(SOCKET_PORT);
             _serverSocket.listen();
         }
 
-        private function socket_connect(e:ServerSocketConnectEvent) :void
-        {
-            _log("New incoming connection");
-
-            var sock:Socket = e.socket;
-            sock.addEventListener(ProgressEvent.SOCKET_DATA, socketListener(sock));
-            _sockets.push(sock);
-        }
-
-        private function socketListener(sock:Socket) :Function
-        {
-            return function (e:ProgressEvent) :void {
-                _log("Data received on socket...");
-                _log(sock.readUTF());
-            }
-        }
-
-        private function broadcast(msg:String) :void
-        {
-            _log("Writing "+msg);
-            for each (var sock:Socket in _sockets) {
-                sock.writeUTF(msg);
-                sock.flush();
-            }
-        }
-
         public function connect(thisIP:String, ips:Vector.<String>, ready:Function) :void
         {
+            if (_connectReady !== null) {
+                throw new Error("Cannot call connect twice on PeerGroupBuilder");
+            }
+
+            _connectReady = ready;
+            _socketsExpected = ips.length - 1;
+
             var ipsArray :Array = [];
             for each (var ip:String in ips) {
                 ipsArray.push(ip);
@@ -70,18 +53,67 @@ package net.jaburns.airp2p
 
             var thisIndex :int = ipsArray.indexOf(thisIP);
 
-            if (thisIndex === 0) {
-                _serverSocket.close();
+            // The last IP on the list is only listening and makes no outgoing connections.
+            if (thisIndex === ipsArray.length - 1) {
+                checkReady();
             }
+            else {
+                // The first IP on the list makes only outgoing connections. Don't need a ServerSocket.
+                if (thisIndex === 0) {
+                    _serverSocket.close();
+                }
 
-            for (var i:int = thisIndex + 1; i < ipsArray.length; ++i) {
-                _log("Making outgoing connection to "+ipsArray[i]);
-                var sock:Socket = new Socket(ipsArray[i], SOCKET_PORT);
-                sock.addEventListener(ProgressEvent.SOCKET_DATA, socketListener(sock));
-                _sockets.push(sock);
+                for (var i:int = thisIndex + 1; i < ipsArray.length; ++i) {
+                    var sock:Socket = new Socket();
+                    sock.addEventListener(Event.CONNECT, outsocket_connect);
+                    sock.connect(ipsArray[i], SOCKET_PORT);
+                }
             }
+        }
 
-            ready(new PeerGroup(broadcast));
+        private function outsocket_connect(e:Event) :void
+        {
+            _log("New outgoing connection");
+            addConnectedSocket(e.target as Socket);
+        }
+
+        private function insocket_connect(e:ServerSocketConnectEvent) :void
+        {
+            _log("New incoming connection");
+            addConnectedSocket(e.socket);
+        }
+
+        private function addConnectedSocket(sock:Socket) :void
+        {
+            sock.addEventListener(ProgressEvent.SOCKET_DATA, socketListener(sock));
+            _sockets.push(sock);
+            checkReady();
+        }
+
+        private function checkReady() :void
+        {
+            if (_socketsExpected < 0) return;
+
+            if (_sockets.length === _socketsExpected) {
+                _connectReady(new PeerGroup(broadcast));
+            }
+        }
+
+        private function socketListener(sock:Socket) :Function
+        {
+            return function (e:ProgressEvent) :void {
+                var msg:String = sock.readUTF();
+                _log("Received: "+msg);
+            }
+        }
+
+        private function broadcast(msg:String) :void
+        {
+            _log("Writing: "+msg);
+            for each (var sock:Socket in _sockets) {
+                sock.writeUTF(msg);
+                sock.flush();
+            }
         }
     }
 }
