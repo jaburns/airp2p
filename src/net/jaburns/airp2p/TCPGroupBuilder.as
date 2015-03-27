@@ -97,7 +97,7 @@ package net.jaburns.airp2p
             if (_socketsExpected < 0) return;
 
             if (_sockets.length === _socketsExpected) {
-                _log("Connections with all peers have been established");
+                _log("Peer group ready!");
                 _peerGroup = new PeerGroup;
                 _peerGroup.bindBroadcaster(broadcast);
                 _connectReady(_peerGroup);
