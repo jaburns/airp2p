@@ -8,7 +8,6 @@ package
 
     import net.jaburns.airp2p.Lobby;
     import net.jaburns.airp2p.LobbyEvent;
-    import net.jaburns.airp2p.PeerGroup;
 
     public class Main extends Sprite
     {
@@ -32,7 +31,7 @@ package
 
             stage.addEventListener(MouseEvent.CLICK, stage_click);
 
-            _lobby = new Lobby(false, log);
+            _lobby = new Lobby(true, log);
             _lobby.addEventListener(LobbyEvent.PEER_CONNECTED, peerConnect);
             _lobby.addEventListener(LobbyEvent.PEER_DISCONNECTED, peerDisconnect);
             _lobby.addEventListener(LobbyEvent.PEER_COMMITTED, peerCommit);
@@ -72,7 +71,7 @@ package
 
         private function lobbyComplete(e:LobbyEvent) :void
         {
-            e.peerGroup.bindReceiver(function(msg:String) {
+            e.peerGroup.bindReceiver(function(msg:String) :void {
                 log("Received: "+msg);
             });
 
