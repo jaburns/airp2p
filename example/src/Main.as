@@ -4,10 +4,12 @@ package
     import flash.display.StageAlign;
     import flash.display.StageScaleMode;
     import flash.events.MouseEvent;
+    import flash.geom.PerspectiveProjection;
     import flash.text.TextField;
 
     import net.jaburns.airp2p.Lobby;
     import net.jaburns.airp2p.P2PEvent;
+    import net.jaburns.airp2p.PeerGroup;
 
     public class Main extends Sprite
     {
@@ -80,9 +82,10 @@ package
 
         private function lobbyComplete(e:P2PEvent) :void
         {
-            var f:Function = e.data as Function;
+            var peers:PeerGroup = e.data as PeerGroup;
+
             _clickFunction = function() :void {
-                f(Math.random().toString());
+                peers.broadcast(Math.random().toString());
             };
         }
     }

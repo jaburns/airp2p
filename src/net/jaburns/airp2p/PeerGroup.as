@@ -2,12 +2,13 @@ package net.jaburns.airp2p
 {
     public class PeerGroup
     {
-        public function PeerGroup()
+        private var _bf :Function = null;
+
+        public function get broadcast() :Function { return _bf; }
+
+        public function PeerGroup(broadcastFunction:Function)
         {
-            // TODO return this from MatchBuilder instead
-            // of returning a broadcast function.  This class
-            // will be how the user of the library interacts
-            // over the established socket network.
+            _bf = broadcastFunction;
         }
     }
 }

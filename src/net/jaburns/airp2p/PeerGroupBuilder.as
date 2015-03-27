@@ -60,7 +60,7 @@ package net.jaburns.airp2p
             }
         }
 
-        public function connect(thisIP:String, ips:Vector.<String>) :Function
+        public function connect(thisIP:String, ips:Vector.<String>, ready:Function) :void
         {
             var ipsArray :Array = [];
             for each (var ip:String in ips) {
@@ -80,8 +80,8 @@ package net.jaburns.airp2p
                 sock.addEventListener(ProgressEvent.SOCKET_DATA, socketListener(sock));
                 _sockets.push(sock);
             }
-            
-            
+
+            ready(new PeerGroup(broadcast));
         }
     }
 }

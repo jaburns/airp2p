@@ -175,9 +175,11 @@ package net.jaburns.airp2p
             var ips:Vector.<String> = getIPs();
 
             if (ips.length === _committedPeerIPs.length) {
-                _log("Everyone in the lobby has committed to a match!");
-                var matchFn :Function = _peerGroupBuilder.connect(_ip, ips);
-                dispatchEvent(new P2PEvent(P2PEvent.LOBBY_COMPLETE, matchFn));
+                _log("Everyone in the lobby has committed to a match. Creating PeerGroup.");
+
+                _peerGroupBuilder.connect(_ip, ips, function(pg:PeerGroup) :void {
+                    dispatchEvent(new P2PEvent(P2PEvent.LOBBY_COMPLETE, pg));
+                });
             }
         }
 
