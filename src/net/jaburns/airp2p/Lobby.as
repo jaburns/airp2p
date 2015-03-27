@@ -25,7 +25,7 @@ package net.jaburns.airp2p
         private var _peerIPs :Object = {};
         private var _committedPeerIPs :Vector.<String> = new <String> [];
 
-        private var _peerGroupBuilder :PeerGroupBuilder;
+        private var _peerGroupBuilder :IPeerGroupBuilder;
 
 
         public function get ip () :String { return _ip; }
@@ -34,7 +34,7 @@ package net.jaburns.airp2p
 
         public function Lobby(log:Function=null)
         {
-            _peerGroupBuilder = new PeerGroupBuilder(log);
+            _peerGroupBuilder = new TCPGroupBuilder(log);
 
             if (log !== null) {
                 _log = function(msg:String) :void {
@@ -56,7 +56,7 @@ package net.jaburns.airp2p
             _netConn.addEventListener(NetStatusEvent.NET_STATUS, netStatus);
             _netConn.connect("rtmfp:");
 
-            _peerGroupBuilder.initServerSocket();
+            _peerGroupBuilder.listen();
 
             _log("IP: "+_ip);
         }

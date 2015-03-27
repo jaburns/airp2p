@@ -5,7 +5,8 @@
     <classEntry path="net.jaburns.airp2p.LANAddress"/>
     <classEntry path="net.jaburns.airp2p.P2PEvent"/>
     <classEntry path="net.jaburns.airp2p.PeerGroup"/>
-    <classEntry path="net.jaburns.airp2p.PeerGroupBuilder"/>
+    <classEntry path="net.jaburns.airp2p.TCPGroupBuilder"/>
+    <classEntry path="net.jaburns.airp2p.IPeerGroupBuilder"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

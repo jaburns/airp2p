@@ -6,7 +6,7 @@ package net.jaburns.airp2p
     import flash.net.ServerSocket;
     import flash.net.Socket;
 
-    internal class PeerGroupBuilder
+    internal class TCPGroupBuilder implements IPeerGroupBuilder
     {
         static private const SOCKET_PORT :int = 7891;
 
@@ -19,7 +19,7 @@ package net.jaburns.airp2p
 
         private var _peerGroup :PeerGroup = null;
 
-        public function PeerGroupBuilder(log:Function=null)
+        public function TCPGroupBuilder(log:Function=null)
         {
             if (log !== null) {
                 _log = function(msg:String) :void {
@@ -30,7 +30,7 @@ package net.jaburns.airp2p
             }
         }
 
-        public function initServerSocket() :void
+        public function listen() :void
         {
             _serverSocket = new ServerSocket;
             _serverSocket.addEventListener(Event.CONNECT, insocket_connect);
