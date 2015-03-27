@@ -17,6 +17,8 @@ package net.jaburns.airp2p
         private var _socketsExpected :int = -1;
         private var _connectReady :Function = null;
 
+        private var _peerGroup :PeerGroup = null;
+
         public function PeerGroupBuilder(log:Function=null)
         {
             if (log !== null) {
@@ -95,7 +97,10 @@ package net.jaburns.airp2p
             if (_socketsExpected < 0) return;
 
             if (_sockets.length === _socketsExpected) {
-                _connectReady(new PeerGroup(broadcast));
+                _log("Connections with all peers have been established");
+                _peerGroup = new PeerGroup;
+                _peerGroup.bindBroadcaster(broadcast);
+                _connectReady(_peerGroup);
             }
         }
 
@@ -103,13 +108,12 @@ package net.jaburns.airp2p
         {
             return function (e:ProgressEvent) :void {
                 var msg:String = sock.readUTF();
-                _log("Received: "+msg);
+                if (_peerGroup) _peerGroup.receive(msg);
             }
         }
 
         private function broadcast(msg:String) :void
         {
-            _log("Writing: "+msg);
             for each (var sock:Socket in _sockets) {
                 sock.writeUTF(msg);
                 sock.flush();

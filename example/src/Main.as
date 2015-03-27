@@ -44,6 +44,11 @@ package
             _clickFunction = toggleCommit;
         }
 
+        private function peerConnect(e:P2PEvent) :void { }
+        private function peerDisconnect(e:P2PEvent) :void { }
+        private function peerCommit(e:P2PEvent) :void { }
+        private function peerUncommit(e:P2PEvent) :void { }
+
         private function log(msg:String) :void
         {
             _tf.appendText(msg);
@@ -52,7 +57,9 @@ package
 
         private function stage_click(e:*) :void
         {
-            _clickFunction();
+            if (_clickFunction) {
+                _clickFunction();
+            }
         }
 
         private function toggleCommit() :void
@@ -64,28 +71,18 @@ package
             }
         }
 
-        private function peerConnect(e:P2PEvent) :void
-        {
-        }
-
-        private function peerDisconnect(e:P2PEvent) :void
-        {
-        }
-
-        private function peerCommit(e:P2PEvent) :void
-        {
-        }
-
-        private function peerUncommit(e:P2PEvent) :void
-        {
-        }
-
         private function lobbyComplete(e:P2PEvent) :void
         {
             var peers:PeerGroup = e.data as PeerGroup;
 
+            peers.bindReceiver(function(msg:String) {
+                log("Received: "+msg);
+            });
+
             _clickFunction = function() :void {
-                peers.broadcast(Math.random().toString());
+                var msg:String = Math.random().toString();
+                log("Sent: "+msg);
+                peers.broadcast(msg);
             };
         }
     }
