@@ -11,18 +11,19 @@ package net.jaburns.airp2p
 
         static public const LOBBY_COMPLETE :String = "lobbyComplete";
 
+        public var peerIP :String = null;
+        public var peerGroup :PeerGroup = null;
 
-        public var data:Object = null;
-
-        public function LobbyEvent(type:String, data:Object=null)
+        public function LobbyEvent(type:String, peerIP:String=null, peerGroup:PeerGroup=null)
         {
             super(type);
-            this.data = data;
+            this.peerIP = peerIP;
+            this.peerGroup = peerGroup;
         }
 
         override public function clone():Event
         {
-            return new LobbyEvent(type, data);
+            return new LobbyEvent(type, peerIP, peerGroup);
         }
     }
 }

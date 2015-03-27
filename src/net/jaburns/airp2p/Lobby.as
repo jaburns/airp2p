@@ -182,7 +182,7 @@ package net.jaburns.airp2p
                 _log("Everyone in the lobby has committed to a match. Creating PeerGroup.");
 
                 _peerGroupBuilder.connect(_ip, ips, function(pg:PeerGroup) :void {
-                    dispatchEvent(new LobbyEvent(LobbyEvent.LOBBY_COMPLETE, pg));
+                    dispatchEvent(new LobbyEvent(LobbyEvent.LOBBY_COMPLETE, null, pg));
                 });
             }
         }

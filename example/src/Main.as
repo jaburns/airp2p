@@ -72,16 +72,14 @@ package
 
         private function lobbyComplete(e:LobbyEvent) :void
         {
-            var peers:PeerGroup = e.data as PeerGroup;
-
-            peers.bindReceiver(function(msg:String) {
+            e.peerGroup.bindReceiver(function(msg:String) {
                 log("Received: "+msg);
             });
 
             _clickFunction = function() :void {
                 var msg:String = Math.random().toString();
                 log("Sent: "+msg);
-                peers.broadcast(msg);
+                e.peerGroup.broadcast(msg);
             };
         }
     }
