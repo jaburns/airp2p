@@ -163,14 +163,14 @@ package net.jaburns.airp2p
                 if (index < 0) {
                     _committedPeerIPs.push(ip);
                     _log(ip + " is committing to match");
-                    dispatchEvent(new P2PEvent(P2PEvent.PEER_COMMITTED, ip));
+                    dispatchEvent(new LobbyEvent(LobbyEvent.PEER_COMMITTED, ip));
                     checkAllCommitted();
                 }
             }
             else if (index >= 0) {
                 _committedPeerIPs.splice(index, 1);
                 _log(ip + " is no longer committed to match");
-                dispatchEvent(new P2PEvent(P2PEvent.PEER_UNCOMMITTED, ip));
+                dispatchEvent(new LobbyEvent(LobbyEvent.PEER_UNCOMMITTED, ip));
             }
         }
 
@@ -182,7 +182,7 @@ package net.jaburns.airp2p
                 _log("Everyone in the lobby has committed to a match. Creating PeerGroup.");
 
                 _peerGroupBuilder.connect(_ip, ips, function(pg:PeerGroup) :void {
-                    dispatchEvent(new P2PEvent(P2PEvent.LOBBY_COMPLETE, pg));
+                    dispatchEvent(new LobbyEvent(LobbyEvent.LOBBY_COMPLETE, pg));
                 });
             }
         }
@@ -192,7 +192,7 @@ package net.jaburns.airp2p
             if (_peerIPs[id] !== ip) {
                 _peerIPs[id] = ip;
                 _log(ip + " has connected to lobby");
-                dispatchEvent(new P2PEvent(P2PEvent.PEER_CONNECTED, ip));
+                dispatchEvent(new LobbyEvent(LobbyEvent.PEER_CONNECTED, ip));
             }
         }
 
@@ -202,7 +202,7 @@ package net.jaburns.airp2p
                 var deadIP:String = _peerIPs[id];
                 delete _peerIPs[id];
                 _log(ip + " has left the lobby");
-                dispatchEvent(new P2PEvent(P2PEvent.PEER_DISCONNECTED, deadIP));
+                dispatchEvent(new LobbyEvent(LobbyEvent.PEER_DISCONNECTED, deadIP));
             }
         }
     }

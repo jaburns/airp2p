@@ -2,7 +2,7 @@ package net.jaburns.airp2p
 {
     import flash.events.Event;
 
-    public class P2PEvent extends Event
+    public class LobbyEvent extends Event
     {
         static public const PEER_CONNECTED :String = "peerConnected";
         static public const PEER_DISCONNECTED :String = "peerDisconnected";
@@ -14,7 +14,7 @@ package net.jaburns.airp2p
 
         public var data:Object = null;
 
-        public function P2PEvent(type:String, data:Object=null)
+        public function LobbyEvent(type:String, data:Object=null)
         {
             super(type);
             this.data = data;
@@ -22,7 +22,7 @@ package net.jaburns.airp2p
 
         override public function clone():Event
         {
-            return new P2PEvent(type, data);
+            return new LobbyEvent(type, data);
         }
     }
 }

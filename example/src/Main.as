@@ -7,7 +7,7 @@ package
     import flash.text.TextField;
 
     import net.jaburns.airp2p.Lobby;
-    import net.jaburns.airp2p.P2PEvent;
+    import net.jaburns.airp2p.LobbyEvent;
     import net.jaburns.airp2p.PeerGroup;
 
     public class Main extends Sprite
@@ -15,7 +15,7 @@ package
         private var _tf :TextField;
         private var _lobby :Lobby;
 
-        private var _clickFunction :Function ;
+        private var _clickFunction :Function;
 
         public function Main()
         {
@@ -33,20 +33,20 @@ package
             stage.addEventListener(MouseEvent.CLICK, stage_click);
 
             _lobby = new Lobby(false, log);
-            _lobby.addEventListener(P2PEvent.PEER_CONNECTED, peerConnect);
-            _lobby.addEventListener(P2PEvent.PEER_DISCONNECTED, peerDisconnect);
-            _lobby.addEventListener(P2PEvent.PEER_COMMITTED, peerCommit);
-            _lobby.addEventListener(P2PEvent.PEER_UNCOMMITTED, peerUncommit);
-            _lobby.addEventListener(P2PEvent.LOBBY_COMPLETE, lobbyComplete);
+            _lobby.addEventListener(LobbyEvent.PEER_CONNECTED, peerConnect);
+            _lobby.addEventListener(LobbyEvent.PEER_DISCONNECTED, peerDisconnect);
+            _lobby.addEventListener(LobbyEvent.PEER_COMMITTED, peerCommit);
+            _lobby.addEventListener(LobbyEvent.PEER_UNCOMMITTED, peerUncommit);
+            _lobby.addEventListener(LobbyEvent.LOBBY_COMPLETE, lobbyComplete);
             _lobby.connect();
 
             _clickFunction = toggleCommit;
         }
 
-        private function peerConnect(e:P2PEvent) :void { }
-        private function peerDisconnect(e:P2PEvent) :void { }
-        private function peerCommit(e:P2PEvent) :void { }
-        private function peerUncommit(e:P2PEvent) :void { }
+        private function peerConnect(e:LobbyEvent) :void { }
+        private function peerDisconnect(e:LobbyEvent) :void { }
+        private function peerCommit(e:LobbyEvent) :void { }
+        private function peerUncommit(e:LobbyEvent) :void { }
 
         private function log(msg:String) :void
         {
@@ -70,7 +70,7 @@ package
             }
         }
 
-        private function lobbyComplete(e:P2PEvent) :void
+        private function lobbyComplete(e:LobbyEvent) :void
         {
             var peers:PeerGroup = e.data as PeerGroup;
 
