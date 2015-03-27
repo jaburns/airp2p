@@ -32,9 +32,13 @@ package net.jaburns.airp2p
         public function get committed() :Boolean { return _committedPeerIPs.indexOf(_ip) >= 0; }
 
 
-        public function Lobby(log:Function=null)
+        public function Lobby(udp:Boolean=false, log:Function=null)
         {
-            _peerGroupBuilder = new TCPGroupBuilder(log);
+            if (udp) {
+                _peerGroupBuilder = new UDPGroupBuilder(log);
+            } else {
+                _peerGroupBuilder = new TCPGroupBuilder(log);
+            }
 
             if (log !== null) {
                 _log = function(msg:String) :void {

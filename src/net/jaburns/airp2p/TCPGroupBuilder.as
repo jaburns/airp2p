@@ -23,7 +23,7 @@ package net.jaburns.airp2p
         {
             if (log !== null) {
                 _log = function(msg:String) :void {
-                    log("[com.jaburns.airp2p.MatchBuilder] "+msg);
+                    log("[com.jaburns.airp2p.TCPGroupBuilder] "+msg);
                 };
             } else {
                 _log = function(msg:String) :void { };

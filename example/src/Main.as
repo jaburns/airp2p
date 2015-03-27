@@ -4,7 +4,6 @@ package
     import flash.display.StageAlign;
     import flash.display.StageScaleMode;
     import flash.events.MouseEvent;
-    import flash.geom.PerspectiveProjection;
     import flash.text.TextField;
 
     import net.jaburns.airp2p.Lobby;
@@ -33,7 +32,7 @@ package
 
             stage.addEventListener(MouseEvent.CLICK, stage_click);
 
-            _lobby = new Lobby(log);
+            _lobby = new Lobby(false, log);
             _lobby.addEventListener(P2PEvent.PEER_CONNECTED, peerConnect);
             _lobby.addEventListener(P2PEvent.PEER_DISCONNECTED, peerDisconnect);
             _lobby.addEventListener(P2PEvent.PEER_COMMITTED, peerCommit);
