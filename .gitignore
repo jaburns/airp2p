@@ -3,3 +3,5 @@
 bin
 bin-debug
 example/cert
+*.apk
+*.ipa
