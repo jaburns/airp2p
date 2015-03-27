@@ -6,7 +6,7 @@ package net.jaburns.airp2p
     import flash.net.ServerSocket;
     import flash.net.Socket;
 
-    internal class MatchBuilder
+    internal class PeerGroupBuilder
     {
         static private const SOCKET_PORT :int = 7891;
 
@@ -15,7 +15,7 @@ package net.jaburns.airp2p
 
         private var _sockets :Vector.<Socket> = new <Socket> [];
 
-        public function MatchBuilder(log:Function=null)
+        public function PeerGroupBuilder(log:Function=null)
         {
             if (log !== null) {
                 _log = function(msg:String) :void {
@@ -80,9 +80,8 @@ package net.jaburns.airp2p
                 sock.addEventListener(ProgressEvent.SOCKET_DATA, socketListener(sock));
                 _sockets.push(sock);
             }
-            // TODO use callback or even to not return Match until all the sockets have connected.
-
-            return broadcast;
+            
+            
         }
     }
 }

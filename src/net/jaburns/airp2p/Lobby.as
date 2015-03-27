@@ -25,7 +25,7 @@ package net.jaburns.airp2p
         private var _peerIPs :Object = {};
         private var _committedPeerIPs :Vector.<String> = new <String> [];
 
-        private var _matchBuilder :MatchBuilder;
+        private var _peerGroupBuilder :PeerGroupBuilder;
 
 
         public function get ip () :String { return _ip; }
@@ -34,7 +34,7 @@ package net.jaburns.airp2p
 
         public function Lobby(log:Function=null)
         {
-            _matchBuilder = new MatchBuilder(log);
+            _peerGroupBuilder = new PeerGroupBuilder(log);
 
             if (log !== null) {
                 _log = function(msg:String) :void {
@@ -56,7 +56,7 @@ package net.jaburns.airp2p
             _netConn.addEventListener(NetStatusEvent.NET_STATUS, netStatus);
             _netConn.connect("rtmfp:");
 
-            _matchBuilder.initServerSocket();
+            _peerGroupBuilder.initServerSocket();
 
             _log("IP: "+_ip);
         }
@@ -176,7 +176,7 @@ package net.jaburns.airp2p
 
             if (ips.length === _committedPeerIPs.length) {
                 _log("Everyone in the lobby has committed to a match!");
-                var matchFn :Function = _matchBuilder.connect(_ip, ips);
+                var matchFn :Function = _peerGroupBuilder.connect(_ip, ips);
                 dispatchEvent(new P2PEvent(P2PEvent.LOBBY_COMPLETE, matchFn));
             }
         }

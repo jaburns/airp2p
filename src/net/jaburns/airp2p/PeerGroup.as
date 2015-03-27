@@ -1,8 +1,8 @@
 package net.jaburns.airp2p
 {
-    public class Match
+    public class PeerGroup
     {
-        public function Match()
+        public function PeerGroup()
         {
             // TODO return this from MatchBuilder instead
             // of returning a broadcast function.  This class
