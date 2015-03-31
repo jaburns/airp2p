@@ -3,18 +3,13 @@ package
     import flash.display.Sprite;
     import flash.display.StageAlign;
     import flash.display.StageScaleMode;
-    import flash.events.MouseEvent;
     import flash.text.TextField;
 
-    import net.jaburns.airp2p.Lobby;
-    import net.jaburns.airp2p.LobbyEvent;
+    import net.jaburns.airp2p.NetGame;
 
     public class Main extends Sprite
     {
         private var _tf :TextField;
-        private var _lobby :Lobby;
-
-        private var _clickFunction :Function;
 
         public function Main()
         {
@@ -29,57 +24,44 @@ package
             _tf.height = 9000;
             addChild(_tf);
 
-            stage.addEventListener(MouseEvent.CLICK, stage_click);
-
-            _lobby = new Lobby(true, log);
-            _lobby.addEventListener(LobbyEvent.PEER_CONNECTED, peerConnect);
-            _lobby.addEventListener(LobbyEvent.PEER_DISCONNECTED, peerDisconnect);
-            _lobby.addEventListener(LobbyEvent.PEER_COMMITTED, peerCommit);
-            _lobby.addEventListener(LobbyEvent.PEER_UNCOMMITTED, peerUncommit);
-            _lobby.addEventListener(LobbyEvent.LOBBY_COMPLETE, lobbyComplete);
-            _lobby.connect();
-
-            _clickFunction = toggleCommit;
+            NetGame.start(new Host, new Client, log);
         }
-
-        private function peerConnect(e:LobbyEvent) :void { }
-        private function peerDisconnect(e:LobbyEvent) :void { }
-        private function peerCommit(e:LobbyEvent) :void { }
-        private function peerUncommit(e:LobbyEvent) :void { }
 
         private function log(msg:String) :void
         {
             _tf.appendText(msg);
             _tf.appendText("\n");
         }
+    }
+}
 
-        private function stage_click(e:*) :void
-        {
-            if (_clickFunction) {
-                _clickFunction();
-            }
-        }
+import net.jaburns.airp2p.IClient;
+import net.jaburns.airp2p.IHost;
 
-        private function toggleCommit() :void
-        {
-            if (_lobby.committed) {
-                _lobby.uncommit();
-            } else {
-                _lobby.commit();
-            }
-        }
+class Client implements IClient {
 
-        private function lobbyComplete(e:LobbyEvent) :void
-        {
-            e.peerGroup.bindReceiver(function(msg:String) :void {
-                log("Received: "+msg);
-            });
+    public function readInputState():Object
+    {
+        return {};
+    }
 
-            _clickFunction = function() :void {
-                var msg:String = Math.random().toString();
-                log("Sent: "+msg);
-                e.peerGroup.broadcast(msg);
-            };
-        }
+    public function renderGameState(state:Object):void
+    {
+    }
+}
+
+class Host implements IHost
+{
+    public function forceState(state:Object):void
+    {
+    }
+
+    public function getState():Object
+    {
+        return {};
+    }
+
+    public function stepGame(inputs:Object):void
+    {
     }
 }

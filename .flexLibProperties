@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <flexLibProperties includeAllClasses="true" useMultiPlatformConfig="false" version="3">
   <includeClasses>
-    <classEntry path="net.jaburns.airp2p.Lobby"/>
-    <classEntry path="net.jaburns.airp2p.LANAddress"/>
-    <classEntry path="net.jaburns.airp2p.LobbyEvent"/>
     <classEntry path="net.jaburns.airp2p.PeerGroup"/>
-    <classEntry path="net.jaburns.airp2p.TCPGroupBuilder"/>
-    <classEntry path="net.jaburns.airp2p.IPeerGroupBuilder"/>
-    <classEntry path="net.jaburns.airp2p.UDPGroupBuilder"/>
+    <classEntry path="net.jaburns.airp2p.LANAddress"/>
+    <classEntry path="net.jaburns.airp2p.PeerGroupEvent"/>
+    <classEntry path="net.jaburns.airp2p.IClient"/>
+    <classEntry path="net.jaburns.airp2p.IHost"/>
+    <classEntry path="net.jaburns.airp2p.NetGame"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
