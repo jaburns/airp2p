@@ -2,8 +2,8 @@ package net.jaburns.airp2p
 {
     public interface IHost
     {
-        function stepGame(inputs:Object) :void;
+        function step(inputs:Object) :void;
         function getState() :Object;
-        function forceState(state:Object) :void;
+        function setState(state:Object) :void;
     }
 }

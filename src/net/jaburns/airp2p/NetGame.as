@@ -15,8 +15,9 @@ package net.jaburns.airp2p
 
         private var _host :IHost;
         private var _client :IClient;
-        private var _peerGroup :PeerGroup;
+        private var _peers :PeerGroup;
         private var _socket :DatagramSocket;
+        private var _hosting :Boolean = false;
 
 
         static public function start(hostLogic:IHost, clientLogic:IClient, logFn:Function) :NetGame
@@ -54,14 +55,17 @@ package net.jaburns.airp2p
             _socket.bind(SOCKET_PORT);
             _socket.receive();
 
-            _peerGroup = new PeerGroup(logFn);
-            _peerGroup.addEventListener(PeerGroupEvent.PEER_CONNECTED, peer_connected);
-            _peerGroup.addEventListener(PeerGroupEvent.PEER_DISCONNECTED, peer_disconnected);
-            _peerGroup.connect();
+            _peers = new PeerGroup(logFn);
+            _peers.addEventListener(PeerGroupEvent.PEER_CONNECTED, peer_connected);
+            _peers.addEventListener(PeerGroupEvent.PEER_DISCONNECTED, peer_disconnected);
+            _peers.connect();
         }
 
         private function peer_connected(e:PeerGroupEvent) :void
         {
+            if (_peers.getIPs().length === 1) {
+                _hosting = true;
+            }
         }
 
         private function peer_disconnected(e:PeerGroupEvent) :void

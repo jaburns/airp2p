@@ -40,19 +40,19 @@ import net.jaburns.airp2p.IHost;
 
 class Client implements IClient {
 
-    public function readInputState():Object
+    public function readInputs():Object
     {
         return {};
     }
 
-    public function renderGameState(state:Object):void
+    public function renderState(state:Object):void
     {
     }
 }
 
 class Host implements IHost
 {
-    public function forceState(state:Object):void
+    public function setState(state:Object):void
     {
     }
 
@@ -61,7 +61,7 @@ class Host implements IHost
         return {};
     }
 
-    public function stepGame(inputs:Object):void
+    public function step(inputs:Object):void
     {
     }
 }

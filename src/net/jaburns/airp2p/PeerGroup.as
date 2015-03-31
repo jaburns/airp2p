@@ -85,6 +85,7 @@ package net.jaburns.airp2p
                 case "NetGroup.Connect.Success":
                     _id = _group.convertPeerIDToGroupAddress(_netConn.nearID);
                     _log("ID: "+_id);
+                    _log("Estimated member count: "+_group.estimatedMemberCount);
                     setPeer(_id, _ip);
                     broadcastSelf();
                     break;
@@ -95,6 +96,7 @@ package net.jaburns.airp2p
 
                 case "NetGroup.Posting.Notify":
                     setPeer(e.info.message.id, e.info.message.ip);
+
                     if (!_hasSharedIP) {
                         _hasSharedIP = true;
                         broadcastSelf();
