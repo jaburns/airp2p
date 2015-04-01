@@ -88,7 +88,11 @@ package net.jaburns.airp2p
                     if (ip === _peers.localIP) continue;
                     sendObject(ip, latestState);
                 }
-            } else {
+
+                _inputs[_peers.localIP] = _client.readInputs();
+                _client.setState(latestState);
+            }
+            else {
                 sendObject(_peers.hostIP, _client.readInputs());
             }
         }
