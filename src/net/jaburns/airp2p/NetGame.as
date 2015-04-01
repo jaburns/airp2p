@@ -28,7 +28,7 @@ package net.jaburns.airp2p
         private var _latestState :Object = null;
 
 
-        static public function start(hostLogic:IHost, clientLogic:IClient, logFn:Function) :NetGame
+        static public function start(hostLogic:IHost, clientLogic:IClient, logFn:Function=null) :NetGame
         {
             if (s_instance !== null) {
                 throw new Error ("NetGame.start has already been called");
@@ -50,7 +50,7 @@ package net.jaburns.airp2p
         }
 
 
-        public function NetGame(hostLogic:IHost, clientLogic:IClient, logFn:Function)
+        public function NetGame(hostLogic:IHost, clientLogic:IClient, logFn:Function=null)
         {
             if (!s_canInstantiate) {
                 throw new Error ("Should call NetGame.start instead of instantiating with new");
