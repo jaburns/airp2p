@@ -24,7 +24,7 @@ package
             _tf.height = 9000;
             addChild(_tf);
 
-            NetGame.start(new Host, new Client, log);
+            NetGame.start(new Host, new Client(this), log);
         }
 
         private function log(msg:String) :void
@@ -32,36 +32,5 @@ package
             _tf.appendText(msg);
             _tf.appendText("\n");
         }
-    }
-}
-
-import net.jaburns.airp2p.IClient;
-import net.jaburns.airp2p.IHost;
-
-class Client implements IClient
-{
-    public function readInputs():Object
-    {
-        return {};
-    }
-
-    public function setState(state:Object):void
-    {
-    }
-}
-
-class Host implements IHost
-{
-    public function setState(state:Object):void
-    {
-    }
-
-    public function getState():Object
-    {
-        return {};
-    }
-
-    public function step(inputs:Object):void
-    {
     }
 }
