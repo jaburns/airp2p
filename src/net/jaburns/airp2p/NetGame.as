@@ -33,7 +33,8 @@ package net.jaburns.airp2p
             return s_instance;
         }
 
-        static public function get instanace() :NetGame {
+        static public function get instanace() :NetGame
+        {
             if (!s_instance === null) {
                 throw new Error ("Must call NetGame.start before getting instance");
             }
@@ -56,19 +57,22 @@ package net.jaburns.airp2p
             _socket.receive();
 
             _peers = new PeerGroup(logFn);
-            _peers.addEventListener(PeerGroupEvent.PEER_CONNECTED, peer_connected);
-            _peers.addEventListener(PeerGroupEvent.PEER_DISCONNECTED, peer_disconnected);
+            _peers.addEventListener(PeerGroupEvent.PEER_CONNECTED, peers_connected);
+            _peers.addEventListener(PeerGroupEvent.PEER_DISCONNECTED, peers_disconnected);
+            _peers.addEventListener(PeerGroupEvent.HOST_DETERMINED, peers_hostDetermined);
             _peers.connect();
         }
 
-        private function peer_connected(e:PeerGroupEvent) :void
+        private function peers_hostDetermined(e:PeerGroupEvent) :void
         {
-            if (_peers.getIPs().length === 1) {
-                _hosting = true;
-            }
+            _hosting = e.ip === _peers.localIP;
         }
 
-        private function peer_disconnected(e:PeerGroupEvent) :void
+        private function peers_connected(e:PeerGroupEvent) :void
+        {
+        }
+
+        private function peers_disconnected(e:PeerGroupEvent) :void
         {
         }
 

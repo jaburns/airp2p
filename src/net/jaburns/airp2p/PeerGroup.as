@@ -2,9 +2,12 @@ package net.jaburns.airp2p
 {
     import flash.events.EventDispatcher;
     import flash.events.NetStatusEvent;
+    import flash.events.TimerEvent;
+    import flash.geom.Point;
     import flash.net.GroupSpecifier;
     import flash.net.NetConnection;
     import flash.net.NetGroup;
+    import flash.utils.Timer;
 
     internal class PeerGroup extends EventDispatcher
     {
@@ -24,8 +27,12 @@ package net.jaburns.airp2p
         private var _hasSharedIP :Boolean = false;
         private var _peerIPs :Object = {};
 
+        private var _pickHostTimer :Timer = null;
+        private var _hostIP :String = null;
+        private var _potentialHosts :Array = null;
 
-        public function get ip () :String { return _ip; }
+
+        public function get localIP () :String { return _ip; }
 
 
         public function PeerGroup(log:Function=null)
@@ -51,6 +58,7 @@ package net.jaburns.airp2p
             _netConn.connect("rtmfp:");
 
             _log("IP: "+_ip);
+            _potentialHosts = [_ip];
         }
 
         public function getIPs() :Vector.<String>
@@ -85,9 +93,13 @@ package net.jaburns.airp2p
                 case "NetGroup.Connect.Success":
                     _id = _group.convertPeerIDToGroupAddress(_netConn.nearID);
                     _log("ID: "+_id);
-                    _log("Estimated member count: "+_group.estimatedMemberCount);
                     setPeer(_id, _ip);
                     broadcastSelf();
+
+                    _pickHostTimer = new Timer(5000, 1);
+                    _pickHostTimer.addEventListener(TimerEvent.TIMER, pickHostTimer_tick);
+                    _pickHostTimer.start();
+
                     break;
 
                 case "NetGroup.Neighbor.Connect":
@@ -95,6 +107,13 @@ package net.jaburns.airp2p
                     break;
 
                 case "NetGroup.Posting.Notify":
+                    if (e.info.message.host) {
+                        setHost(e.info.message.host);
+                    }
+                    else if (_potentialHosts) {
+                        _potentialHosts.push(e.info.message.ip);
+                    }
+
                     setPeer(e.info.message.id, e.info.message.ip);
 
                     if (!_hasSharedIP) {
@@ -109,9 +128,32 @@ package net.jaburns.airp2p
             }
         }
 
+        private function pickHostTimer_tick(e:TimerEvent) :void
+        {
+            setHost(_potentialHosts.sort().pop());
+            broadcastSelf();
+        }
+
+        private function setHost(ip:String) :void
+        {
+            if (_hostIP) return;
+
+            _log("Host IP determined: " + ip);
+            _hostIP = ip;
+
+            if (_pickHostTimer) {
+                _pickHostTimer.stop();
+                _pickHostTimer.removeEventListener(TimerEvent.TIMER, pickHostTimer_tick);
+                _pickHostTimer = null;
+            }
+            _potentialHosts = null;
+
+            dispatchEvent(new PeerGroupEvent(PeerGroupEvent.HOST_DETERMINED, _hostIP));
+        }
+
         private function broadcastSelf() :void
         {
-            _group.post({ id:_id, ip:_ip });
+            _group.post({ id:_id, ip:_ip, host:_hostIP });
         }
 
         private function setPeer(id:String, ip:String) :void

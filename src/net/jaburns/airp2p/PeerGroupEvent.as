@@ -6,6 +6,7 @@ package net.jaburns.airp2p
     {
         static public const PEER_CONNECTED :String = "peerConnected";
         static public const PEER_DISCONNECTED :String = "peerDisconnected";
+        static public const HOST_DETERMINED :String = "hostDetermined";
 
         public var ip :String = null;
 
