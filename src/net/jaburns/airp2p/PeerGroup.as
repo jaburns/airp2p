@@ -3,7 +3,6 @@ package net.jaburns.airp2p
     import flash.events.EventDispatcher;
     import flash.events.NetStatusEvent;
     import flash.events.TimerEvent;
-    import flash.geom.Point;
     import flash.net.GroupSpecifier;
     import flash.net.NetConnection;
     import flash.net.NetGroup;
@@ -33,6 +32,7 @@ package net.jaburns.airp2p
 
 
         public function get localIP () :String { return _ip; }
+        public function get hostIP () :String { return _hostIP; }
 
 
         public function PeerGroup(log:Function=null)
@@ -170,7 +170,7 @@ package net.jaburns.airp2p
             if (_peerIPs[id]) {
                 var deadIP:String = _peerIPs[id];
                 delete _peerIPs[id];
-                _log(ip + " has left the lobby");
+                _log(localIP + " has left the lobby");
                 dispatchEvent(new PeerGroupEvent(PeerGroupEvent.PEER_DISCONNECTED, deadIP));
             }
         }

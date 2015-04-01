@@ -38,14 +38,14 @@ package
 import net.jaburns.airp2p.IClient;
 import net.jaburns.airp2p.IHost;
 
-class Client implements IClient {
-
+class Client implements IClient
+{
     public function readInputs():Object
     {
         return {};
     }
 
-    public function renderState(state:Object):void
+    public function setState(state:Object):void
     {
     }
 }

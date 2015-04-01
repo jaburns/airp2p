@@ -1,8 +1,10 @@
 package net.jaburns.airp2p
 {
     import flash.events.DatagramSocketDataEvent;
+    import flash.events.TimerEvent;
     import flash.net.DatagramSocket;
     import flash.utils.ByteArray;
+    import flash.utils.Timer;
 
     public class NetGame
     {
@@ -18,6 +20,12 @@ package net.jaburns.airp2p
         private var _peers :PeerGroup;
         private var _socket :DatagramSocket;
         private var _hosting :Boolean = false;
+        private var _loopTimer :Timer;
+
+        // Hash of input objects indexed by the IP address of the sender.  Used when hosting only.
+        private var _inputs :Object = {};
+
+        private var _latestState :Object = null;
 
 
         static public function start(hostLogic:IHost, clientLogic:IClient, logFn:Function) :NetGame
@@ -57,8 +65,6 @@ package net.jaburns.airp2p
             _socket.receive();
 
             _peers = new PeerGroup(logFn);
-            _peers.addEventListener(PeerGroupEvent.PEER_CONNECTED, peers_connected);
-            _peers.addEventListener(PeerGroupEvent.PEER_DISCONNECTED, peers_disconnected);
             _peers.addEventListener(PeerGroupEvent.HOST_DETERMINED, peers_hostDetermined);
             _peers.connect();
         }
@@ -66,24 +72,40 @@ package net.jaburns.airp2p
         private function peers_hostDetermined(e:PeerGroupEvent) :void
         {
             _hosting = e.ip === _peers.localIP;
+
+            _loopTimer = new Timer(40);
+            _loopTimer.addEventListener(TimerEvent.TIMER, loopTimer_tick);
+            _loopTimer.start();
         }
 
-        private function peers_connected(e:PeerGroupEvent) :void
+        private function loopTimer_tick(e:TimerEvent) :void
         {
-        }
+            if (_hosting) {
+                _host.step(_inputs);
+                var latestState :Object = _host.getState();
 
-        private function peers_disconnected(e:PeerGroupEvent) :void
-        {
+                for each (var ip:String in _peers.getIPs()) {
+                    if (ip === _peers.localIP) continue;
+                    sendObject(ip, latestState);
+                }
+            } else {
+                sendObject(_peers.hostIP, _client.readInputs());
+            }
         }
 
         private function socket_receive(e:DatagramSocketDataEvent) :void
         {
+            if (_hosting) {
+                _inputs[e.srcAddress] = e.data.readObject();
+            } else {
+                _client.setState(e.data.readObject());
+            }
         }
 
-        private function sendData() :void
+        private function sendObject(ip:String, obj:Object) :void
         {
-            var data:ByteArray = null;
-            var ip:String = "127.0.0.1";
+            var data:ByteArray = new ByteArray;
+            data.writeObject(obj);
             _socket.send(data, 0, 0, ip, SOCKET_PORT);
         }
     }
