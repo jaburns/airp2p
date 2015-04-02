@@ -178,12 +178,20 @@ package net.jaburns.airp2p
                 }
 
                 // Update the client system (read inputs, render state) on the host device.
-                _inputs[_peers.localIP] = _client.readInput();
-                _client.notifyGameState(_gameState);
+                _inputs[_peers.localIP] = baClone(_client.readInput());
+                _client.notifyGameState(baClone(_gameState));
             }
             else {
                 sendObject(_peers.hostIP, _client.readInput());
             }
+        }
+
+        private function baClone(obj:Object) :Object
+        {
+            var ba:ByteArray = new ByteArray;
+            ba.writeObject(obj);
+            ba.position = 0;
+            return ba.readObject();
         }
 
         private function socket_receive(e:DatagramSocketDataEvent) :void
