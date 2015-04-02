@@ -3,8 +3,12 @@ package net.jaburns.airp2p
     import flash.events.DatagramSocketDataEvent;
     import flash.events.TimerEvent;
     import flash.net.DatagramSocket;
+    import flash.net.registerClassAlias;
     import flash.utils.ByteArray;
     import flash.utils.Timer;
+    import flash.utils.describeType;
+
+    import avmplus.getQualifiedClassName;
 
     public class NetGame
     {
@@ -15,7 +19,9 @@ package net.jaburns.airp2p
         static private var s_instance :NetGame = null;
 
 
-        private var _host :IHost;
+        private var _gameStateClass :Class;
+        private var _gameState :Object;
+
         private var _client :IClient;
         private var _peers :PeerGroup;
         private var _socket :DatagramSocket;
@@ -28,14 +34,21 @@ package net.jaburns.airp2p
         private var _latestState :Object = null;
 
 
-        static public function start(hostLogic:IHost, clientLogic:IClient, logFn:Function=null) :NetGame
+        static public function registerTypes(...args) :void
+        {
+            for each (var klass:Class in args) {
+                registerClassAlias(getQualifiedClassName(klass), klass);
+            }
+        }
+
+        static public function start(gameStateClass:Class, clientLogic:IClient, logFn:Function=null) :NetGame
         {
             if (s_instance !== null) {
                 throw new Error ("NetGame.start has already been called");
             }
 
             s_canInstantiate = true;
-            s_instance = new NetGame(hostLogic, clientLogic, logFn);
+            s_instance = new NetGame(gameStateClass, clientLogic, logFn);
             s_canInstantiate = false;
 
             return s_instance;
@@ -50,13 +63,18 @@ package net.jaburns.airp2p
         }
 
 
-        public function NetGame(hostLogic:IHost, clientLogic:IClient, logFn:Function=null)
+        public function NetGame(gameStateClass:Class, clientLogic:IClient, logFn:Function=null)
         {
             if (!s_canInstantiate) {
                 throw new Error ("Should call NetGame.start instead of instantiating with new");
             }
 
-            _host = hostLogic;
+            if (!checkForUpdateMethod(gameStateClass)) {
+                throw new Error ("Class supplied as gameStateClass must have a public method update(Object):void");
+            }
+
+            _gameStateClass = gameStateClass;
+            _gameState = new _gameStateClass;
             _client = clientLogic;
 
             _socket = new DatagramSocket();
@@ -81,16 +99,15 @@ package net.jaburns.airp2p
         private function loopTimer_tick(e:TimerEvent) :void
         {
             if (_hosting) {
-                _host.step(_inputs);
-                var latestState :Object = _host.getState();
+                _gameState.update(_inputs);
 
                 for each (var ip:String in _peers.getIPs()) {
                     if (ip === _peers.localIP) continue;
-                    sendObject(ip, latestState);
+                    sendObject(ip, _gameState);
                 }
 
                 _inputs[_peers.localIP] = _client.readInputs();
-                _client.setState(latestState);
+                _client.setState(_gameState);
             }
             else {
                 sendObject(_peers.hostIP, _client.readInputs());
@@ -111,6 +128,26 @@ package net.jaburns.airp2p
             var data:ByteArray = new ByteArray;
             data.writeObject(obj);
             _socket.send(data, 0, 0, ip, SOCKET_PORT);
+        }
+
+
+        static private function checkForUpdateMethod(klass:Class) :Boolean
+        {
+            var info:XML = describeType(klass);
+            for each (var method:XML in info.factory.method) {
+                if (method.@name == "update") {
+                    if (method.@returnType != "void") return false;
+                    for each (var child:XML in method.children()) {
+                        if (child.name() == "parameter") {
+                            if (child.@index != "1") return false;
+                            if (child.@type != "Object") return false;
+                        }
+                    }
+                    return true;
+                }
+
+            }
+            return false;
         }
     }
 }

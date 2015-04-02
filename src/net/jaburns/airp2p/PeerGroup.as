@@ -61,6 +61,11 @@ package net.jaburns.airp2p
             _potentialHosts = [_ip];
         }
 
+        public function disconnect() :void
+        {
+
+        }
+
         public function getIPs() :Vector.<String>
         {
             var ret :Vector.<String> = new <String> [];

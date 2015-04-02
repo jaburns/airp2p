@@ -4,12 +4,17 @@ package
     import flash.display.StageAlign;
     import flash.display.StageScaleMode;
     import flash.text.TextField;
+    import flash.utils.describeType;
+
+    import game.GameState;
+    import game.InputState;
+    import game.Player;
 
     import net.jaburns.airp2p.NetGame;
 
     public class Main extends Sprite
     {
-        private var _tf :TextField;
+        private var _tf :TextField = new TextField;
 
         public function Main()
         {
@@ -18,13 +23,20 @@ package
             stage.align = StageAlign.TOP_LEFT;
             stage.scaleMode = StageScaleMode.NO_SCALE;
 
-            _tf = new TextField;
             _tf.y = 100;
             _tf.width = stage.stageWidth;
             _tf.height = 9000;
             addChild(_tf);
 
-            NetGame.start(new Host, new Client(this), log);
+            NetGame.registerTypes(
+                InputState,
+                GameState,
+                Player
+            );
+
+            NetGame.start(GameState, new Client(this), log);
+
+            //NetGame.start(GameState, new Clie
         }
 
         private function log(msg:String) :void
