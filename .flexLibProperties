@@ -6,6 +6,7 @@
     <classEntry path="net.jaburns.airp2p.PeerGroupEvent"/>
     <classEntry path="net.jaburns.airp2p.IClient"/>
     <classEntry path="net.jaburns.airp2p.NetGame"/>
+    <classEntry path="net.jaburns.airp2p.Interpolate"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

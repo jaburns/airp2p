@@ -38,6 +38,11 @@ package net.jaburns.airp2p
 
         static public function registerTypes(...args) :void
         {
+            // Instead of requiring the user to provide all types which are going to be serialized
+            // we can do describeType(GameState) and recursively walk the types of the public
+            // fields while calling registerClassAlias(typeName, getDefinitionByName(typeName)).
+            // That, of course, is more complex than asking for a list of used types, but it would be nice.
+
             for each (var klass:Class in args) {
                 registerClassAlias(getQualifiedClassName(klass), klass);
             }
