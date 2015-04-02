@@ -25,6 +25,8 @@
                 <string>1</string>
                 <string>2</string>
             </array>
+            <key>UIApplicationExitsOnSuspend</key>
+            <true/>
         ]]></InfoAdditions>
         <requestedDisplayResolution>high</requestedDisplayResolution>
     </iPhone>

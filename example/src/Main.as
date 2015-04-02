@@ -34,6 +34,7 @@ package
 
         private function log(msg:String) :void
         {
+            trace(msg);
             _tf.appendText(msg);
             _tf.appendText("\n");
         }

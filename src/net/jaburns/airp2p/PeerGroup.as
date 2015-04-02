@@ -39,7 +39,7 @@ package net.jaburns.airp2p
         {
             if (log !== null) {
                 _log = function(msg:String) :void {
-                    log("[com.jaburns.airp2p.PeerGroup] "+msg);
+                    log("[PeerGroup] "+msg);
                 };
             } else {
                 _log = function(msg:String) :void { };
@@ -177,6 +177,16 @@ package net.jaburns.airp2p
                 delete _peerIPs[id];
                 _log(deadIP + " has left the lobby");
                 dispatchEvent(new PeerGroupEvent(PeerGroupEvent.PEER_DISCONNECTED, deadIP));
+
+                if (_hostIP === deadIP) {
+                    dispatchEvent(new PeerGroupEvent(PeerGroupEvent.HOST_DISCONNECTED, deadIP));
+
+                    var potentialHosts :Array = [];
+                    for each (var ip:String in _peerIPs) potentialHosts.push(ip);
+                    _hostIP = potentialHosts.sort().pop();
+
+                    dispatchEvent(new PeerGroupEvent(PeerGroupEvent.HOST_DETERMINED, _hostIP));
+                }
             }
         }
     }

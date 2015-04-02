@@ -1,4 +1,4 @@
-package 
+package
 {
     public class Player
     {
@@ -8,8 +8,8 @@ package
 
         public function Player()
         {
-            x = 500 + 200*Math.random();
-            y = 100 + 600*Math.random();
+            x = 100 + 500*Math.random();
+            y = 300 + 300*Math.random();
         }
 
         public function update(input:InputState) :void
