@@ -56,12 +56,11 @@ package net.jaburns.airp2p
             return s_instance;
         }
 
-        static public function get instanace() :NetGame
+        static public function stop() :void
         {
-            if (!s_instance === null) {
-                throw new Error ("Must call NetGame.start before getting instance");
-            }
-            return s_instance;
+            if (s_instance === null) return;
+            s_instance.dispose();
+            s_instance = null;
         }
 
 
@@ -100,6 +99,20 @@ package net.jaburns.airp2p
             _peers.connect();
         }
 
+        public function dispose() :void
+        {
+            _socket.close();
+            _socket.removeEventListener(DatagramSocketDataEvent.DATA, socket_receive);
+
+            _peers.disconnect();
+            _peers.removeEventListener(PeerGroupEvent.PEER_CONNECTED, peers_peerConnected);
+            _peers.removeEventListener(PeerGroupEvent.PEER_DISCONNECTED, peers_peerDisconnected);
+            _peers.removeEventListener(PeerGroupEvent.HOST_DETERMINED, peers_hostDetermined);
+            _peers.removeEventListener(PeerGroupEvent.HOST_DISCONNECTED, peers_hostDisconnected);
+
+            disposeTimer();
+        }
+
         private function peers_hostDetermined(e:PeerGroupEvent) :void
         {
             _hosting = e.ip === _peers.localIP;
@@ -115,9 +128,16 @@ package net.jaburns.airp2p
         private function peers_hostDisconnected(e:PeerGroupEvent) :void
         {
             _log("Host disconnected. Stopping updates.");
-            _loopTimer.stop();
-            _loopTimer.removeEventListener(TimerEvent.TIMER, loopTimer_tick);
-            _loopTimer = null;
+            disposeTimer();
+        }
+
+        private function disposeTimer() :void
+        {
+            if (_loopTimer) {
+                _loopTimer.stop();
+                _loopTimer.removeEventListener(TimerEvent.TIMER, loopTimer_tick);
+                _loopTimer = null;
+            }
         }
 
         private function peers_peerConnected(e:PeerGroupEvent) :void

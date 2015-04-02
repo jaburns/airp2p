@@ -1,6 +1,7 @@
 package
 {
     import flash.display.Sprite;
+    import flash.events.Event;
     import flash.events.MouseEvent;
 
     import net.jaburns.airp2p.IClient;
@@ -15,6 +16,7 @@ package
             _root = root;
             _root.stage.addEventListener(MouseEvent.MOUSE_DOWN, stage_mouseDown);
             _root.stage.addEventListener(MouseEvent.MOUSE_UP, stage_mouseUp);
+            _root.addEventListener(Event.ENTER_FRAME, enterFrame);
         }
 
         private function stage_mouseDown(e:MouseEvent) :void
@@ -25,6 +27,11 @@ package
         private function stage_mouseUp(e:MouseEvent) :void
         {
             _input.tapping = false;
+        }
+
+        private function enterFrame(e:Event) :void
+        {
+            // TODO interpolate game state and render
         }
 
     // IClient implementation

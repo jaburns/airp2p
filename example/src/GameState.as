@@ -5,6 +5,10 @@ package
         // Dictionary of Player objects indexed by IP.
         public var players :Object = {};
 
+        // Keeps track of the time since the game session was started.
+        public var time :Number = 0;
+
+
         public function update(inputsByIP:Object) :void
         {
             // Add new players to the game if we're seeing a new IP in the inputs collection.
@@ -21,8 +25,10 @@ package
                 }
             }
 
+            time += 1.0;
+
             for (ip in players) {
-                players[ip].update(inputsByIP[ip]);
+                players[ip].update(time, inputsByIP[ip]);
             }
         }
     }

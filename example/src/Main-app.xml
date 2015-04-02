@@ -7,6 +7,9 @@
     <initialWindow>
         <content>[This value will be overwritten by Flash Builder in the output app.xml]</content>
         <visible>true</visible>
+        <aspectRatio>portrait</aspectRatio>
+        <autoOrients>false</autoOrients>
+        <fullScreen>true</fullScreen>
     </initialWindow>
     <android>
         <manifestAdditions><![CDATA[

@@ -12,8 +12,10 @@ package
             y = 300 + 300*Math.random();
         }
 
-        public function update(input:InputState) :void
+        public function update(time:Number, input:InputState) :void
         {
+            x += 2*Math.sin(time / 20);
+            y += 2*Math.cos(time / 20);
             squished = input.tapping;
         }
     }

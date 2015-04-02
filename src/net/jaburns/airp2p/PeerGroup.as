@@ -61,6 +61,25 @@ package net.jaburns.airp2p
             _potentialHosts = [_ip];
         }
 
+        public function disconnect() :void
+        {
+            if (_group) _group.close();
+            if (_netConn) _netConn.close();
+
+            disposeTimer();
+
+            _id = null;
+            _ip = null;
+
+            _netConn = null;
+            _group = null;
+
+            _hasSharedIP = false;
+            _peerIPs = {};
+            _hostIP = null;
+            _potentialHosts = null;
+        }
+
         public function getIPs() :Vector.<String>
         {
             var ret :Vector.<String> = new <String> [];
@@ -140,15 +159,18 @@ package net.jaburns.airp2p
 
             _log("Host IP determined: " + ip);
             _hostIP = ip;
+            _potentialHosts = null;
 
+            dispatchEvent(new PeerGroupEvent(PeerGroupEvent.HOST_DETERMINED, _hostIP));
+        }
+
+        private function disposeTimer() :void
+        {
             if (_pickHostTimer) {
                 _pickHostTimer.stop();
                 _pickHostTimer.removeEventListener(TimerEvent.TIMER, pickHostTimer_tick);
                 _pickHostTimer = null;
             }
-            _potentialHosts = null;
-
-            dispatchEvent(new PeerGroupEvent(PeerGroupEvent.HOST_DETERMINED, _hostIP));
         }
 
         private function broadcastSelf() :void
