@@ -1,4 +1,4 @@
-package 
+package
 {
     public class GameState
     {
@@ -24,11 +24,6 @@ package
             for (ip in players) {
                 players[ip].update(inputsByIP[ip]);
             }
-        }
-
-        public function horse() :void
-        {
-
         }
     }
 }
