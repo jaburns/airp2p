@@ -163,6 +163,8 @@ package net.jaburns.airp2p
 
         private function socket_receive(e:DatagramSocketDataEvent) :void
         {
+            if (!_loopTimer) return;
+
             if (_hosting) {
                 _inputs[e.srcAddress] = e.data.readObject();
             } else {
