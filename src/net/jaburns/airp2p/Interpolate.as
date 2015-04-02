@@ -21,7 +21,7 @@ package net.jaburns.airp2p
             if (t < 0) t = 0;
 
             var ba:ByteArray = new ByteArray;
-            ba.writeObject(a);
+            ba.writeObject(b);
             ba.position = 0;
             var ret:Object = ba.readObject();
 
