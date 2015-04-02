@@ -61,11 +61,6 @@ package net.jaburns.airp2p
             _potentialHosts = [_ip];
         }
 
-        public function disconnect() :void
-        {
-
-        }
-
         public function getIPs() :Vector.<String>
         {
             var ret :Vector.<String> = new <String> [];
@@ -184,6 +179,8 @@ package net.jaburns.airp2p
                     var potentialHosts :Array = [];
                     for each (var ip:String in _peerIPs) potentialHosts.push(ip);
                     _hostIP = potentialHosts.sort().pop();
+
+                    _log("Host migrated to: " + _hostIP);
 
                     dispatchEvent(new PeerGroupEvent(PeerGroupEvent.HOST_DETERMINED, _hostIP));
                 }
