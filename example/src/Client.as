@@ -11,7 +11,7 @@ package
 
     public class Client implements IClient
     {
-        private var _inputs :InputState = new InputState;
+        private var _input :InputState = new InputState;
         private var _root :Sprite;
 
         public function Client(root:Sprite)
@@ -21,19 +21,19 @@ package
             _root.stage.addEventListener(MouseEvent.MOUSE_UP, stage_mouseUp);
         }
 
-        public function readInputs():Object { return _inputs; }
+        public function readInput():Object { return _input; }
 
         private function stage_mouseDown(e:MouseEvent) :void
         {
-            _inputs.tapping = true;
+            _input.tapping = true;
         }
 
         private function stage_mouseUp(e:MouseEvent) :void
         {
-            _inputs.tapping = false;
+            _input.tapping = false;
         }
 
-        public function setState(stateObj:Object):void
+        public function notifyGameState(stateObj:Object):void
         {
             var state:GameState = stateObj as GameState;
 

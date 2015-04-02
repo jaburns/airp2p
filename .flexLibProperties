@@ -5,7 +5,6 @@
     <classEntry path="net.jaburns.airp2p.LANAddress"/>
     <classEntry path="net.jaburns.airp2p.PeerGroupEvent"/>
     <classEntry path="net.jaburns.airp2p.IClient"/>
-    <classEntry path="net.jaburns.airp2p.IHost"/>
     <classEntry path="net.jaburns.airp2p.NetGame"/>
   </includeClasses>
   <includeResources/>

@@ -106,11 +106,11 @@ package net.jaburns.airp2p
                     sendObject(ip, _gameState);
                 }
 
-                _inputs[_peers.localIP] = _client.readInputs();
-                _client.setState(_gameState);
+                _inputs[_peers.localIP] = _client.readInput();
+                _client.notifyGameState(_gameState);
             }
             else {
-                sendObject(_peers.hostIP, _client.readInputs());
+                sendObject(_peers.hostIP, _client.readInput());
             }
         }
 
@@ -119,7 +119,7 @@ package net.jaburns.airp2p
             if (_hosting) {
                 _inputs[e.srcAddress] = e.data.readObject();
             } else {
-                _client.setState(e.data.readObject());
+                _client.notifyGameState(e.data.readObject());
             }
         }
 
@@ -145,7 +145,6 @@ package net.jaburns.airp2p
                     }
                     return true;
                 }
-
             }
             return false;
         }
