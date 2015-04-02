@@ -10,6 +10,8 @@ package
     [SWF(frameRate="60", backgroundColor="#FFFFFF")]
     public class Main extends Sprite
     {
+        static public const TICK_LENGTH :Number = 40;//ms (25 ticks per second)
+
         private var _tf :TextField = new TextField;
 
         public function Main()
@@ -28,7 +30,7 @@ package
                 GameState,
                 Player
             );
-            NetGame.start(GameState, new Client(this), log);
+            NetGame.start(GameState, new Client(this), TICK_LENGTH, log);
         }
 
         private function log(msg:String) :void

@@ -27,6 +27,7 @@ package net.jaburns.airp2p
         private var _peers :PeerGroup;
         private var _socket :DatagramSocket;
         private var _hosting :Boolean = false;
+        private var _tickLength :Number;
         private var _loopTimer :Timer;
 
         // Hash of input objects indexed by the IP address of the sender.  Used when hosting only.
@@ -48,14 +49,14 @@ package net.jaburns.airp2p
             }
         }
 
-        static public function start(gameStateClass:Class, clientLogic:IClient, log:Function=null) :NetGame
+        static public function start(gameStateClass:Class, clientLogic:IClient, tickLength:Number, log:Function=null) :NetGame
         {
             if (s_instance !== null) {
                 throw new Error ("NetGame.start has already been called");
             }
 
             s_canInstantiate = true;
-            s_instance = new NetGame(gameStateClass, clientLogic, log);
+            s_instance = new NetGame(gameStateClass, clientLogic, tickLength, log);
             s_canInstantiate = false;
 
             return s_instance;
@@ -69,7 +70,7 @@ package net.jaburns.airp2p
         }
 
 
-        public function NetGame(gameStateClass:Class, clientLogic:IClient, log:Function=null)
+        public function NetGame(gameStateClass:Class, clientLogic:IClient, tickLength:Number, log:Function=null)
         {
             if (!s_canInstantiate) {
                 throw new Error ("Should call NetGame.start instead of instantiating with new");
@@ -86,6 +87,8 @@ package net.jaburns.airp2p
             } else {
                 _log = function(msg:String) :void { };
             }
+
+            _tickLength = tickLength;
 
             _gameStateClass = gameStateClass;
             _gameState = new _gameStateClass;
@@ -125,7 +128,7 @@ package net.jaburns.airp2p
             _inputs = {};
 
             _log("Host determined. Starting updates.");
-            _loopTimer = new Timer(40);
+            _loopTimer = new Timer(_tickLength);
             _loopTimer.addEventListener(TimerEvent.TIMER, loopTimer_tick);
             _loopTimer.start();
         }

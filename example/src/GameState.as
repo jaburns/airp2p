@@ -6,8 +6,7 @@ package
     {
         static public const interpolationPaths :Vector.<Vector.<String>> = Interpolate.genPaths(
             "players.*.x",
-            "players.*.y",
-            "time"
+            "players.*.y"
         );
 
         // Dictionary of Player objects indexed by IP.

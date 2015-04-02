@@ -34,6 +34,8 @@ package net.jaburns.airp2p
 
         static private function _preserveType(t:Number, a:Object, b:Object, ret:Object, path:Vector.<String>) :void
         {
+            if (a === null || b === null) return;
+
             while (path.length > 1) {
                 var pathItem:String = path.shift();
 

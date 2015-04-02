@@ -39,9 +39,12 @@ package
         {
             if (_prevState === null || _thisState === null) return;
 
-            var t:Number = (Number(getTimer()) - _stateArriveTime) / 40; // TODO don't hardcode this. Tick rate = 40ms per tick
+            var t:Number = (Number(getTimer()) - _stateArriveTime) / Main.TICK_LENGTH;
 
-            var interState:GameState = Interpolate.preserveType(t, _prevState, _thisState, GameState.interpolationPaths) as GameState;
+            var interState:GameState = Interpolate.preserveType(
+                t, _prevState, _thisState, GameState.interpolationPaths
+            ) as GameState;
+
             renderState(interState);
         }
 
