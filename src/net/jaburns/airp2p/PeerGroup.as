@@ -160,6 +160,7 @@ package net.jaburns.airp2p
             _log("Host IP determined: " + ip);
             _hostIP = ip;
             _potentialHosts = null;
+            disposeTimer();
 
             dispatchEvent(new PeerGroupEvent(PeerGroupEvent.HOST_DETERMINED, _hostIP));
         }
