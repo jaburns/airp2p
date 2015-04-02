@@ -19,7 +19,6 @@ package net.jaburns.airp2p
         static public function preserveType(t:Number, a:Object, b:Object, fieldPaths:Vector.<Vector.<String>>) :Object
         {
             if (t < 0) t = 0;
-            if (t > 1) t = 1;
 
             var ba:ByteArray = new ByteArray;
             ba.writeObject(a);

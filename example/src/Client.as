@@ -3,13 +3,19 @@ package
     import flash.display.Sprite;
     import flash.events.Event;
     import flash.events.MouseEvent;
+    import flash.utils.getTimer;
 
     import net.jaburns.airp2p.IClient;
+    import net.jaburns.airp2p.Interpolate;
 
     public class Client implements IClient
     {
         private var _input :InputState = new InputState;
         private var _root :Sprite;
+
+        private var _prevState :GameState;
+        private var _thisState :GameState;
+        private var _stateArriveTime :Number;
 
         public function Client(root:Sprite)
         {
@@ -31,7 +37,23 @@ package
 
         private function enterFrame(e:Event) :void
         {
-            // TODO interpolate game state and render
+            if (_prevState === null || _thisState === null) return;
+
+            var t:Number = (Number(getTimer()) - _stateArriveTime) / 40; // TODO don't hardcode this. Tick rate = 40ms per tick
+
+            var interState:GameState = Interpolate.preserveType(t, _prevState, _thisState, GameState.interpolationPaths) as GameState;
+            renderState(interState);
+        }
+
+        private function renderState(state:GameState) :void
+        {
+            _root.graphics.clear();
+
+            for each (var player:Player in state.players) {
+                _root.graphics.beginFill(0, 1);
+                _root.graphics.drawCircle(player.x, player.y, player.squished ? 5 : 20);
+                _root.graphics.endFill();
+            }
         }
 
     // IClient implementation
@@ -40,15 +62,9 @@ package
 
         public function notifyGameState(stateObj:Object):void
         {
-            var state:GameState = stateObj as GameState;
-
-            _root.graphics.clear();
-
-            for each (var player:Player in state.players) {
-                _root.graphics.beginFill(0, 1);
-                _root.graphics.drawCircle(player.x, player.y, player.squished ? 5 : 20);
-                _root.graphics.endFill();
-            }
+            _prevState = _thisState;
+            _thisState = stateObj as GameState;
+            _stateArriveTime = getTimer();
         }
     }
 }

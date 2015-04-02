@@ -1,7 +1,15 @@
 package
 {
+    import net.jaburns.airp2p.Interpolate;
+
     public class GameState
     {
+        static public const interpolationPaths :Vector.<Vector.<String>> = Interpolate.genPaths(
+            "players.*.x",
+            "players.*.y",
+            "time"
+        );
+
         // Dictionary of Player objects indexed by IP.
         public var players :Object = {};
 
