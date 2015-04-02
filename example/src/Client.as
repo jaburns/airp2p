@@ -3,10 +3,6 @@ package
     import flash.display.Sprite;
     import flash.events.MouseEvent;
 
-    import game.GameState;
-    import game.InputState;
-    import game.Player;
-
     import net.jaburns.airp2p.IClient;
 
     public class Client implements IClient
@@ -21,8 +17,6 @@ package
             _root.stage.addEventListener(MouseEvent.MOUSE_UP, stage_mouseUp);
         }
 
-        public function readInput():Object { return _input; }
-
         private function stage_mouseDown(e:MouseEvent) :void
         {
             _input.tapping = true;
@@ -32,6 +26,10 @@ package
         {
             _input.tapping = false;
         }
+
+    // IClient implementation
+
+        public function readInput():Object { return _input; }
 
         public function notifyGameState(stateObj:Object):void
         {

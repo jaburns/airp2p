@@ -4,11 +4,6 @@ package
     import flash.display.StageAlign;
     import flash.display.StageScaleMode;
     import flash.text.TextField;
-    import flash.utils.describeType;
-
-    import game.GameState;
-    import game.InputState;
-    import game.Player;
 
     import net.jaburns.airp2p.NetGame;
 
@@ -35,8 +30,6 @@ package
             );
 
             NetGame.start(GameState, new Client(this), log);
-
-            //NetGame.start(GameState, new Clie
         }
 
         private function log(msg:String) :void
