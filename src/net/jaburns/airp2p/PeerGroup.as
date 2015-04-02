@@ -175,7 +175,7 @@ package net.jaburns.airp2p
             if (_peerIPs[id]) {
                 var deadIP:String = _peerIPs[id];
                 delete _peerIPs[id];
-                _log(localIP + " has left the lobby");
+                _log(deadIP + " has left the lobby");
                 dispatchEvent(new PeerGroupEvent(PeerGroupEvent.PEER_DISCONNECTED, deadIP));
             }
         }
