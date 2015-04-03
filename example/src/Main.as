@@ -25,6 +25,8 @@ package
             _tf.height = 9000;
             addChild(_tf);
 
+            log("Start");
+
             NetGame.registerTypes(
                 InputState,
                 GameState,

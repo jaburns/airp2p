@@ -14,9 +14,10 @@
     <android>
         <manifestAdditions><![CDATA[
             <manifest android:installLocation="auto">
-                <uses-permission android:name="android.permission.INTERNET"/>
-                <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-                <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+                <uses-permission android:name="android.permission.INTERNET" />
+                <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+                <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+                <uses-permission android:name="android.permission.WAKE_LOCK" />
             </manifest>
         ]]></manifestAdditions>
     </android>
@@ -33,9 +34,4 @@
         ]]></InfoAdditions>
         <requestedDisplayResolution>high</requestedDisplayResolution>
     </iPhone>
-
-
-
-
-
 </application>

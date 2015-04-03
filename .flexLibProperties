@@ -7,6 +7,7 @@
     <classEntry path="net.jaburns.airp2p.IClient"/>
     <classEntry path="net.jaburns.airp2p.NetGame"/>
     <classEntry path="net.jaburns.airp2p.Interpolate"/>
+    <classEntry path="net.jaburns.airp2p.Platform"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

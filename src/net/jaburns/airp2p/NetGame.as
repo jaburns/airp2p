@@ -59,6 +59,8 @@ package net.jaburns.airp2p
             s_instance = new NetGame(gameStateClass, clientLogic, tickLength, log);
             s_canInstantiate = false;
 
+            Platform.start();
+
             return s_instance;
         }
 
@@ -67,6 +69,8 @@ package net.jaburns.airp2p
             if (s_instance === null) return;
             s_instance.dispose();
             s_instance = null;
+
+            Platform.stop();
         }
 
 
