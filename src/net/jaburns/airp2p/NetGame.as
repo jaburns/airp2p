@@ -1,6 +1,7 @@
 package net.jaburns.airp2p
 {
     import flash.events.DatagramSocketDataEvent;
+    import flash.events.Event;
     import flash.events.TimerEvent;
     import flash.net.DatagramSocket;
     import flash.net.registerClassAlias;
@@ -130,6 +131,8 @@ package net.jaburns.airp2p
             _hosting = e.ip === _peers.localIP;
             _freshInputs = true;
             _inputs = {};
+
+            _client.notifyConnected();
 
             _log("Host determined. Starting updates.");
             _loopTimer = new Timer(_tickLength);
