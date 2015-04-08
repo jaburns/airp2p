@@ -29,11 +29,16 @@ package
         public function readInput():Object { return _input; }
 
         //IClient
-        public function notifyConnected() :void
+        public function notifyConnected(connected:Boolean) :void
         {
-            _root.stage.addEventListener(MouseEvent.MOUSE_DOWN, stage_mouseDown);
-            _root.stage.addEventListener(MouseEvent.MOUSE_UP, stage_mouseUp);
-            _connected = true;
+            if (connected) {
+                _root.stage.addEventListener(MouseEvent.MOUSE_DOWN, stage_mouseDown);
+                _root.stage.addEventListener(MouseEvent.MOUSE_UP, stage_mouseUp);
+            } else {
+                _root.stage.removeEventListener(MouseEvent.MOUSE_DOWN, stage_mouseDown);
+                _root.stage.removeEventListener(MouseEvent.MOUSE_UP, stage_mouseUp);
+            }
+            _connected = connected;
         }
 
         //IClient

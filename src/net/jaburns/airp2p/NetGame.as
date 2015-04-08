@@ -31,6 +31,9 @@ package net.jaburns.airp2p
         private var _tickLength :Number;
         private var _loopTimer :Timer;
 
+        private var _clientConnected :Boolean = false;
+        private var _ticksWithoutReceiveState :int = 0;
+
         // Hash of input objects indexed by the IP address of the sender.  Used when hosting only.
         private var _freshInputs :Boolean;
         private var _inputs :Object;
@@ -126,13 +129,19 @@ package net.jaburns.airp2p
             disposeTimer();
         }
 
+        private function notifyClientConnected(connected:Boolean) :void
+        {
+            if (_clientConnected !== connected) {
+                _client.notifyConnected(connected);
+                _clientConnected = connected;
+            }
+        }
+
         private function peers_hostDetermined(e:PeerGroupEvent) :void
         {
             _hosting = e.ip === _peers.localIP;
             _freshInputs = true;
             _inputs = {};
-
-            _client.notifyConnected();
 
             _log("Host determined. Starting updates.");
             _loopTimer = new Timer(_tickLength);
@@ -188,11 +197,16 @@ package net.jaburns.airp2p
                 }
 
                 // Update the client system (read inputs, render state) on the host device.
+                notifyClientConnected(true);
                 _inputs[_peers.localIP] = baClone(_client.readInput());
                 _client.notifyGameState(baClone(_gameState));
             }
             else {
                 sendObject(_peers.hostIP, _client.readInput());
+
+                if (++_ticksWithoutReceiveState >= 2) {
+                    notifyClientConnected(false);
+                }
             }
         }
 
@@ -211,6 +225,9 @@ package net.jaburns.airp2p
             if (_hosting) {
                 _inputs[e.srcAddress] = e.data.readObject();
             } else {
+                _ticksWithoutReceiveState = 0;
+                notifyClientConnected(true);
+
                 _gameState = e.data.readObject();
                 _client.notifyGameState(_gameState);
             }
