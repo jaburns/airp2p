@@ -210,14 +210,6 @@ package net.jaburns.airp2p
             }
         }
 
-        private function baClone(obj:Object) :Object
-        {
-            var ba:ByteArray = new ByteArray;
-            ba.writeObject(obj);
-            ba.position = 0;
-            return ba.readObject();
-        }
-
         private function socket_receive(e:DatagramSocketDataEvent) :void
         {
             if (!_loopTimer) return;
@@ -246,6 +238,13 @@ package net.jaburns.airp2p
             _socket.send(data, 0, 0, ip, SOCKET_PORT);
         }
 
+        static private function baClone(obj:Object) :Object
+        {
+            var ba:ByteArray = new ByteArray;
+            ba.writeObject(obj);
+            ba.position = 0;
+            return ba.readObject();
+        }
 
         static private function checkForUpdateMethod(klass:Class) :Boolean
         {

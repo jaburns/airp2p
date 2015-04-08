@@ -16,6 +16,7 @@ package
 
         private var _prevState :GameState;
         private var _thisState :GameState;
+        private var _interState :GameState;
         private var _stateArriveTime :Number;
 
 
@@ -62,7 +63,13 @@ package
 
         private function enterFrame(e:Event) :void
         {
+            _root.graphics.clear();
+
             if (!_connected) {
+                if (_interState !== null) {
+                    renderState(_interState);
+                }
+
                 renderSpinner();
                 return;
             }
@@ -71,11 +78,11 @@ package
 
             var t:Number = (Number(getTimer()) - _stateArriveTime) / Main.TICK_LENGTH;
 
-            var interState:GameState = Interpolate.preserveType(
+            _interState = Interpolate.preserveType(
                 t, _prevState, _thisState, GameState.interpolationPaths
             ) as GameState;
 
-            renderState(interState);
+            renderState(_interState);
         }
 
         private function renderSpinner() :void
@@ -83,7 +90,6 @@ package
             const RADIUS :Number = 20;
             var theta :Number = getTimer() / 500;
 
-            _root.graphics.clear();
             _root.graphics.lineStyle(10, 0);
             _root.graphics.moveTo(
                 _root.stage.stageWidth  / 2 + RADIUS*Math.cos(theta),
@@ -97,8 +103,6 @@ package
 
         private function renderState(state:GameState) :void
         {
-            _root.graphics.clear();
-
             for each (var player:Player in state.players) {
                 _root.graphics.beginFill(0, 1);
                 _root.graphics.drawCircle(player.x, player.y, player.squished ? 5 : 20);
