@@ -1,15 +1,14 @@
 package net.jaburns.airp2p
 {
     import flash.events.DatagramSocketDataEvent;
-    import flash.events.Event;
     import flash.events.TimerEvent;
     import flash.net.DatagramSocket;
     import flash.net.registerClassAlias;
     import flash.utils.ByteArray;
     import flash.utils.Timer;
     import flash.utils.describeType;
-
-    import avmplus.getQualifiedClassName;
+    import flash.utils.getTimer;
+    import flash.utils.getQualifiedClassName;
 
     public class NetGame
     {
@@ -33,6 +32,7 @@ package net.jaburns.airp2p
 
         private var _clientConnected :Boolean = false;
         private var _ticksWithoutReceiveState :int = 0;
+        private var _lastReceiveTime :int = 0;
 
         // Hash of input objects indexed by the IP address of the sender.  Used when hosting only.
         private var _freshInputs :Boolean;
@@ -178,7 +178,8 @@ package net.jaburns.airp2p
         private function loopTimer_tick(e:TimerEvent) :void
         {
             if (_hosting) {
-                // Make sure that we've received an input packet from each player before updating.
+                _inputs[_peers.localIP] = baClone(_client.readInput());
+
                 if (_freshInputs) {
                     _freshInputs = false;
                     for each (var ip:String in _peers.getIPs()) {
@@ -188,23 +189,22 @@ package net.jaburns.airp2p
                         }
                     }
                 }
+
                 if (!_freshInputs) {
                     _gameState.update(_inputs);
                     for each (ip in _peers.getIPs()) {
                         if (ip === _peers.localIP) continue;
                         sendObject(ip, _gameState);
                     }
-                }
 
-                // Update the client system (read inputs, render state) on the host device.
-                notifyClientConnected(true);
-                _inputs[_peers.localIP] = baClone(_client.readInput());
-                _client.notifyGameState(baClone(_gameState));
+                    notifyClientConnected(true);
+                    _client.notifyGameState(baClone(_gameState));
+                }
             }
             else {
                 sendObject(_peers.hostIP, _client.readInput());
 
-                if (++_ticksWithoutReceiveState >= 2) {
+                if (++_ticksWithoutReceiveState >= 3) {
                     notifyClientConnected(false);
                 }
             }
@@ -225,11 +225,17 @@ package net.jaburns.airp2p
             if (_hosting) {
                 _inputs[e.srcAddress] = e.data.readObject();
             } else {
-                _ticksWithoutReceiveState = 0;
-                notifyClientConnected(true);
+                var newReceiveTime :int = getTimer();
+                var orphanPacket :Boolean = newReceiveTime - _lastReceiveTime > _tickLength * 2;
+                _lastReceiveTime = getTimer();
 
-                _gameState = e.data.readObject();
-                _client.notifyGameState(_gameState);
+                if (!orphanPacket) {
+                    _ticksWithoutReceiveState = 0;
+                    notifyClientConnected(true);
+
+                    _gameState = e.data.readObject();
+                    _client.notifyGameState(_gameState);
+                }
             }
         }
 
