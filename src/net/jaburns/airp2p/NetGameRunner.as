@@ -4,7 +4,6 @@ package net.jaburns.airp2p
     import flash.events.TimerEvent;
     import flash.net.DatagramSocket;
     import flash.utils.ByteArray;
-    import flash.utils.Timer;
     import flash.utils.describeType;
     import flash.utils.getQualifiedClassName;
     import flash.utils.getTimer;
@@ -22,8 +21,7 @@ package net.jaburns.airp2p
         private var _peers :PeerGroup;
         private var _socket :DatagramSocket;
         private var _hosting :Boolean = false;
-        private var _tickLength :Number;
-        private var _loopTimer :Timer;
+        private var _timer :TickTimer;
 
         private var _clientConnected :Boolean = false;
         private var _ticksWithoutReceiveState :int = 0;
@@ -50,7 +48,8 @@ package net.jaburns.airp2p
                 _log = function(msg:String) :void { };
             }
 
-            _tickLength = tickLength;
+            _timer = new TickTimer(tickLength);
+            _timer.addEventListener(TimerEvent.TIMER, loopTimer_tick);
 
             _gameStateClass = gameStateClass;
             _gameState = new _gameStateClass;
@@ -80,7 +79,8 @@ package net.jaburns.airp2p
             _peers.removeEventListener(PeerGroupEvent.HOST_DETERMINED, peers_hostDetermined);
             _peers.removeEventListener(PeerGroupEvent.HOST_DISCONNECTED, peers_hostDisconnected);
 
-            disposeTimer();
+            _timer.stop();
+            _timer.removeEventListener(TimerEvent.TIMER, loopTimer_tick);
         }
 
         private function notifyClientConnected(connected:Boolean) :void
@@ -98,24 +98,13 @@ package net.jaburns.airp2p
             _inputs = {};
 
             _log("Host determined. Starting updates.");
-            _loopTimer = new Timer(_tickLength);
-            _loopTimer.addEventListener(TimerEvent.TIMER, loopTimer_tick);
-            _loopTimer.start();
+            _timer.start();
         }
 
         private function peers_hostDisconnected(e:PeerGroupEvent) :void
         {
             _log("Host disconnected. Stopping updates.");
-            disposeTimer();
-        }
-
-        private function disposeTimer() :void
-        {
-            if (_loopTimer) {
-                _loopTimer.stop();
-                _loopTimer.removeEventListener(TimerEvent.TIMER, loopTimer_tick);
-                _loopTimer = null;
-            }
+            _timer.stop();
         }
 
         private function peers_peerConnected(e:PeerGroupEvent) :void
@@ -166,13 +155,13 @@ package net.jaburns.airp2p
 
         private function socket_receive(e:DatagramSocketDataEvent) :void
         {
-            if (!_loopTimer) return;
+            if (!_timer.running) return;
 
             if (_hosting) {
                 _inputs[e.srcAddress] = e.data.readObject();
             } else {
                 var newReceiveTime :int = getTimer();
-                var orphanPacket :Boolean = newReceiveTime - _lastReceiveTime > _tickLength * 2;
+                var orphanPacket :Boolean = newReceiveTime - _lastReceiveTime > _timer.interval * 2;
                 _lastReceiveTime = getTimer();
 
                 if (!orphanPacket) {

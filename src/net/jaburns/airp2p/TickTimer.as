@@ -10,14 +10,19 @@ package net.jaburns.airp2p
     {
         static public const TICK :String = "tick";
 
+        private var _interval :Number = NaN;
         private var _timer :Timer = null;
         private var _sprite :Sprite = null;
         private var _running :Boolean = false;
 
         public function get running() :Boolean { return _running; }
+        public function get interval() :Number { return _interval; }
 
         public function TickTimer(interval:Number)
         {
+            _interval = interval;
+            // TODO get the root framerate to determine interval when using NaN
+
             if (isNaN(interval)) {
                 _sprite = new Sprite;
             } else {
