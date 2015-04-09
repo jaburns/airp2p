@@ -12,6 +12,7 @@
     <classEntry path="net.jaburns.airp2p.NetGameRunner"/>
     <classEntry path="net.jaburns.airp2p.OfflineGameRunner"/>
     <classEntry path="net.jaburns.airp2p.Util"/>
+    <classEntry path="net.jaburns.airp2p.TickTimer"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
