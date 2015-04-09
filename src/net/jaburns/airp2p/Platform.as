@@ -8,11 +8,15 @@ package net.jaburns.airp2p
     internal class Platform
     {
         static private var s_originalIdleMode :String;
+        static private var s_started :Boolean = false;
 
         static private function get isAndroid() :Boolean { return Capabilities.version.indexOf('AND') >= 0; }
 
         static public function start() :void
         {
+            if (s_started) return;
+            s_started = true;
+
             s_originalIdleMode = NativeApplication.nativeApplication.systemIdleMode;
             NativeApplication.nativeApplication.systemIdleMode = SystemIdleMode.KEEP_AWAKE;
 
@@ -23,6 +27,9 @@ package net.jaburns.airp2p
 
         static public function stop() :void
         {
+            if (!s_started) return;
+            s_started = false;
+
             NativeApplication.nativeApplication.systemIdleMode = s_originalIdleMode;
 
             if (isAndroid) {
