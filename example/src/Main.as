@@ -6,6 +6,7 @@ package
     import flash.text.TextField;
 
     import net.jaburns.airp2p.NetGame;
+    import net.jaburns.airp2p.TickRate;
 
     [SWF(frameRate="60", backgroundColor="#FFFFFF")]
     public class Main extends Sprite
@@ -32,7 +33,7 @@ package
                 GameState,
                 Player
             );
-            NetGame.start(GameState, new Client(this), TICK_LENGTH, log);
+            NetGame.start(true, GameState, new Client(this), TickRate.timer(TICK_LENGTH), log);
         }
 
         private function log(msg:String) :void

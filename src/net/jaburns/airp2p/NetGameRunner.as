@@ -1,7 +1,7 @@
 package net.jaburns.airp2p
 {
     import flash.events.DatagramSocketDataEvent;
-    import flash.events.TimerEvent;
+    import flash.events.Event;
     import flash.net.DatagramSocket;
     import flash.utils.ByteArray;
     import flash.utils.describeType;
@@ -34,7 +34,7 @@ package net.jaburns.airp2p
         private var _latestState :Object = null;
 
 
-        public function start(gameStateClass:Class, clientLogic:IClient, tickLength:Number, log:Function=null) :void
+        public function start(gameStateClass:Class, clientLogic:IClient, tickRate:TickRate, log:Function=null) :void
         {
             if (!Util.checkForUpdateMethod(gameStateClass)) {
                 throw new Error ("Class supplied as gameStateClass must have a public method update(Object):void");
@@ -48,8 +48,8 @@ package net.jaburns.airp2p
                 _log = function(msg:String) :void { };
             }
 
-            _timer = new TickTimer(tickLength);
-            _timer.addEventListener(TimerEvent.TIMER, loopTimer_tick);
+            _timer = new TickTimer(tickRate);
+            _timer.addEventListener(TickTimer.TICK, timer_tick);
 
             _gameStateClass = gameStateClass;
             _gameState = new _gameStateClass;
@@ -80,7 +80,7 @@ package net.jaburns.airp2p
             _peers.removeEventListener(PeerGroupEvent.HOST_DISCONNECTED, peers_hostDisconnected);
 
             _timer.stop();
-            _timer.removeEventListener(TimerEvent.TIMER, loopTimer_tick);
+            _timer.removeEventListener(TickTimer.TICK, timer_tick);
         }
 
         private function notifyClientConnected(connected:Boolean) :void
@@ -118,7 +118,7 @@ package net.jaburns.airp2p
             }
         }
 
-        private function loopTimer_tick(e:TimerEvent) :void
+        private function timer_tick(e:Event) :void
         {
             if (_hosting) {
                 _inputs[_peers.localIP] = Util.deepClone(_client.readInput());

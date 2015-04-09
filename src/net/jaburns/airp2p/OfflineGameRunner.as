@@ -12,7 +12,7 @@ package net.jaburns.airp2p
 
         private var _timer :TickTimer;
 
-        public function start(gameStateClass:Class, clientLogic:IClient, tickLength:Number, log:Function=null):void
+        public function start(gameStateClass:Class, clientLogic:IClient, tickRate:TickRate, log:Function=null) :void
         {
             if (!Util.checkForUpdateMethod(gameStateClass)) {
                 throw new Error ("Class supplied as gameStateClass must have a public method update(Object):void");
@@ -30,11 +30,12 @@ package net.jaburns.airp2p
                 _log = function(msg:String) :void { };
             }
 
-            _timer = new TickTimer(tickLength);
-            _timer.addEventListener(TickTimer.TICK, timer_tick);
-
             _log("Starting single player session.");
             _client.notifyConnected(true);
+
+            _timer = new TickTimer(tickRate);
+            _timer.addEventListener(TickTimer.TICK, timer_tick);
+            _timer.start();
         }
 
         private function timer_tick(e:Event) :void

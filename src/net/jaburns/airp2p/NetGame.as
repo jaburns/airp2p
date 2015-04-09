@@ -21,26 +21,20 @@ package net.jaburns.airp2p
             }
         }
 
-        static public function start(gameStateClass:Class, clientLogic:IClient, tickLength:Number, log:Function=null) :void
+        static public function start(online:Boolean, gameStateClass:Class, clientLogic:IClient, tickRate:TickRate, log:Function=null) :void
         {
             if (s_runner !== null) {
                 throw new Error ("NetGame has already been started");
             }
 
-            s_runner = new NetGameRunner;
-            s_runner.start(gameStateClass, clientLogic, tickLength, log);
-
-            Platform.start();
-        }
-
-        static public function startOffline(gameStateClass:Class, clientLogic:IClient, tickLength:Number, log:Function=null) :void
-        {
-            if (s_runner !== null) {
-                throw new Error ("NetGame has already been started");
+            if (online) {
+                s_runner = new NetGameRunner;
+                Platform.start();
+            } else {
+                s_runner = new OfflineGameRunner;
             }
 
-            s_runner = new OfflineGameRunner;
-            s_runner.start(gameStateClass, clientLogic, tickLength, log);
+            s_runner.start(gameStateClass, clientLogic, tickRate, log);
         }
 
         static public function stop() :void

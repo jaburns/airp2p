@@ -6,11 +6,11 @@ package net.jaburns.airp2p
     import flash.events.TimerEvent;
     import flash.utils.Timer;
 
-    public class TickTimer extends EventDispatcher
+    internal class TickTimer extends EventDispatcher
     {
         static public const TICK :String = "tick";
 
-        private var _interval :Number = NaN;
+        private var _interval :Number;
         private var _timer :Timer = null;
         private var _sprite :Sprite = null;
         private var _running :Boolean = false;
@@ -18,12 +18,11 @@ package net.jaburns.airp2p
         public function get running() :Boolean { return _running; }
         public function get interval() :Number { return _interval; }
 
-        public function TickTimer(interval:Number)
+        public function TickTimer(rate:TickRate)
         {
-            _interval = interval;
-            // TODO get the root framerate to determine interval when using NaN
+            _interval = rate.interval;
 
-            if (isNaN(interval)) {
+            if (rate.boundToEnterFrame) {
                 _sprite = new Sprite;
             } else {
                 _timer = new Timer(interval);
