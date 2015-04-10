@@ -98,6 +98,7 @@ package net.jaburns.airp2p
             _inputs = {};
 
             _log("Host determined. Starting updates.");
+            notifyClientConnected(true);
             _timer.start();
         }
 
