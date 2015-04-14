@@ -5,10 +5,14 @@ package
     import flash.events.MouseEvent;
     import flash.utils.getTimer;
 
-    import net.jaburns.airp2p.IClient;
-    import net.jaburns.airp2p.Interpolate;
+    import model.GameState;
+    import model.PlayerState;
 
-    public class Client implements IClient
+    import net.jaburns.airp2p.IGameView;
+    import net.jaburns.airp2p.Interpolate;
+    import model.InputState;
+
+    public class GameView implements IGameView
     {
         private var _input :InputState = new InputState;
         private var _root :Sprite;
@@ -20,16 +24,16 @@ package
         private var _stateArriveTime :Number;
 
 
-        public function Client(root:Sprite)
+        public function GameView(root:Sprite)
         {
             _root = root;
             _root.addEventListener(Event.ENTER_FRAME, enterFrame);
         }
 
-        //IClient
+        // IGameView
         public function readInput():Object { return _input; }
 
-        //IClient
+        // IGameView
         public function notifyConnected(connected:Boolean) :void
         {
             if (connected) {
@@ -42,8 +46,8 @@ package
             _connected = connected;
         }
 
-        //IClient
-        public function notifyGameState(stateObj:Object):void
+        // IGameView
+        public function update(stateObj:Object):void
         {
             _prevState = _thisState;
             _thisState = stateObj as GameState;
@@ -103,7 +107,7 @@ package
 
         private function renderState(state:GameState) :void
         {
-            for each (var player:Player in state.players) {
+            for each (var player:PlayerState in state.players) {
                 _root.graphics.beginFill(0, 1);
                 _root.graphics.drawCircle(player.x, player.y, player.squished ? 5 : 20);
                 _root.graphics.endFill();

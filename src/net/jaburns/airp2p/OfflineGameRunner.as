@@ -4,23 +4,30 @@ package net.jaburns.airp2p
 
     internal class OfflineGameRunner implements IGameRunner
     {
-        private var _gameStateClass :Class;
-        private var _gameState :Object;
+        private var _modelClass :Class;
+        private var _controllerClass :Class;
+
+        private var _model :Object;
+        private var _view :IGameView;
+        private var _controller :IGameController;
 
         private var _log :Function;
-        private var _client :IClient;
-
         private var _timer :TickTimer;
 
-        public function start(gameStateClass:Class, clientLogic:IClient, tickRate:TickRate, log:Function=null) :void
+        public function start(
+            modelClass:Class,
+            controllerClass:Class,
+            viewInstance:IGameView,
+            tickRate:TickRate,
+            log:Function=null
+        ):void
         {
-            if (!Util.checkForUpdateMethod(gameStateClass)) {
-                throw new Error ("Class supplied as gameStateClass must have a public method update(Object):void");
-            }
+            _modelClass = modelClass;
+            _controllerClass = controllerClass;
+            _view = viewInstance;
 
-            _gameStateClass = gameStateClass;
-            _client = clientLogic;
-            _gameState = new _gameStateClass;
+            _model = new _modelClass;
+            _controller = new _controllerClass;
 
             if (log !== null) {
                 _log = function(msg:String) :void {
@@ -31,7 +38,7 @@ package net.jaburns.airp2p
             }
 
             _log("Starting single player session.");
-            _client.notifyConnected(true);
+            _view.notifyConnected(true);
 
             _timer = new TickTimer(tickRate);
             _timer.addEventListener(TickTimer.TICK, timer_tick);
@@ -40,14 +47,14 @@ package net.jaburns.airp2p
 
         private function timer_tick(e:Event) :void
         {
-            _gameState.update({"p1": Util.deepClone(_client.readInput())});
-            _client.notifyGameState(Util.deepClone(_gameState));
+            _controller.update(_model, {"p1": Util.deepClone(_view.readInput())});
+            _view.update(Util.deepClone(_model));
         }
 
         public function stop() :void
         {
             _log("Stopping single player session.");
-            _client.notifyConnected(false);
+            _view.notifyConnected(false);
 
             _timer.stop();
             _timer = null;

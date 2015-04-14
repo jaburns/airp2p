@@ -7,6 +7,9 @@ package
 
     import net.jaburns.airp2p.NetGame;
     import net.jaburns.airp2p.TickRate;
+    import model.GameState;
+    import model.PlayerState;
+    import model.InputState;
 
     [SWF(frameRate="60", backgroundColor="#FFFFFF")]
     public class Main extends Sprite
@@ -28,12 +31,12 @@ package
 
             log("Start");
 
-            NetGame.registerTypes(
+            NetGame.registerModelTypes(
                 InputState,
                 GameState,
-                Player
+                PlayerState
             );
-            NetGame.start(true, GameState, new Client(this), TickRate.timer(TICK_LENGTH), log);
+            NetGame.start(true, GameState, GameController, new GameView(this), TickRate.timer(TICK_LENGTH), log);
         }
 
         private function log(msg:String) :void

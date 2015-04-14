@@ -4,7 +4,7 @@
     <classEntry path="net.jaburns.airp2p.PeerGroup"/>
     <classEntry path="net.jaburns.airp2p.LANAddress"/>
     <classEntry path="net.jaburns.airp2p.PeerGroupEvent"/>
-    <classEntry path="net.jaburns.airp2p.IClient"/>
+    <classEntry path="net.jaburns.airp2p.IGameView"/>
     <classEntry path="net.jaburns.airp2p.NetGame"/>
     <classEntry path="net.jaburns.airp2p.Interpolate"/>
     <classEntry path="net.jaburns.airp2p.Platform"/>
@@ -14,6 +14,7 @@
     <classEntry path="net.jaburns.airp2p.Util"/>
     <classEntry path="net.jaburns.airp2p.TickTimer"/>
     <classEntry path="net.jaburns.airp2p.TickRate"/>
+    <classEntry path="net.jaburns.airp2p.IGameController"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

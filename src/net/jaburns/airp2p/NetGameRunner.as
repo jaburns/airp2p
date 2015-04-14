@@ -12,12 +12,14 @@ package net.jaburns.airp2p
     {
         static private const SOCKET_PORT :int = 30322;
 
+        private var _modelClass :Class;
+        private var _controllerClass :Class;
 
-        private var _gameStateClass :Class;
-        private var _gameState :Object;
+        private var _model :Object;
+        private var _view :IGameView;
+        private var _controller :IGameController;
 
         private var _log :Function;
-        private var _client :IClient;
         private var _peers :PeerGroup;
         private var _socket :DatagramSocket;
         private var _hosting :Boolean = false;
@@ -34,12 +36,14 @@ package net.jaburns.airp2p
         private var _latestState :Object = null;
 
 
-        public function start(gameStateClass:Class, clientLogic:IClient, tickRate:TickRate, log:Function=null) :void
+        public function start(
+            modelClass:Class,
+            controllerClass:Class,
+            viewInstance:IGameView,
+            tickRate:TickRate,
+            log:Function=null
+        ):void
         {
-            if (!Util.checkForUpdateMethod(gameStateClass)) {
-                throw new Error ("Class supplied as gameStateClass must have a public method update(Object):void");
-            }
-
             if (log !== null) {
                 _log = function(msg:String) :void {
                     log("[NetGameRunner] "+msg);
@@ -51,9 +55,11 @@ package net.jaburns.airp2p
             _timer = new TickTimer(tickRate);
             _timer.addEventListener(TickTimer.TICK, timer_tick);
 
-            _gameStateClass = gameStateClass;
-            _gameState = new _gameStateClass;
-            _client = clientLogic;
+            _modelClass = modelClass;
+            _controllerClass = controllerClass;
+
+            _model = new _modelClass;
+            _view = viewInstance;
 
             _socket = new DatagramSocket();
             _socket.addEventListener(DatagramSocketDataEvent.DATA, socket_receive);
@@ -86,7 +92,7 @@ package net.jaburns.airp2p
         private function notifyClientConnected(connected:Boolean) :void
         {
             if (_clientConnected !== connected) {
-                _client.notifyConnected(connected);
+                _view.notifyConnected(connected);
                 _clientConnected = connected;
             }
         }
@@ -96,6 +102,10 @@ package net.jaburns.airp2p
             _hosting = e.ip === _peers.localIP;
             _freshInputs = true;
             _inputs = {};
+
+            if (_hosting && _controller === null) {
+                _controller = new _controllerClass;
+            }
 
             _log("Host determined. Starting updates.");
             notifyClientConnected(true);
@@ -122,7 +132,7 @@ package net.jaburns.airp2p
         private function timer_tick(e:Event) :void
         {
             if (_hosting) {
-                _inputs[_peers.localIP] = Util.deepClone(_client.readInput());
+                _inputs[_peers.localIP] = Util.deepClone(_view.readInput());
 
                 if (_freshInputs) {
                     _freshInputs = false;
@@ -135,18 +145,19 @@ package net.jaburns.airp2p
                 }
 
                 if (!_freshInputs) {
-                    _gameState.update(_inputs);
+                    _controller.update(_model, _inputs);
+
                     for each (ip in _peers.getIPs()) {
                         if (ip === _peers.localIP) continue;
-                        sendObject(ip, _gameState);
+                        sendObject(ip, _model);
                     }
 
                     notifyClientConnected(true);
-                    _client.notifyGameState(Util.deepClone(_gameState));
+                    _view.update(Util.deepClone(_model));
                 }
             }
             else {
-                sendObject(_peers.hostIP, _client.readInput());
+                sendObject(_peers.hostIP, _view.readInput());
 
                 if (++_ticksWithoutReceiveState >= 3) {
                     notifyClientConnected(false);
@@ -169,8 +180,8 @@ package net.jaburns.airp2p
                     _ticksWithoutReceiveState = 0;
                     notifyClientConnected(true);
 
-                    _gameState = e.data.readObject();
-                    _client.notifyGameState(_gameState);
+                    _model = e.data.readObject();
+                    _view.update(_model);
                 }
             }
         }

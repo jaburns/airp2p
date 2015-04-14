@@ -9,19 +9,21 @@ package net.jaburns.airp2p
     {
         static private var s_runner :IGameRunner = null;
 
-        static public function registerTypes(...args) :void
+        static public function registerModelTypes(...args) :void
         {
-            // Instead of requiring the user to provide all types which are going to be serialized
-            // we can do describeType(GameState) and recursively walk the types of the public
-            // fields while calling registerClassAlias(typeName, getDefinitionByName(typeName)).
-            // That, of course, is more complex than asking for a list of used types, but it would be nice.
-
             for each (var klass:Class in args) {
                 registerClassAlias(getQualifiedClassName(klass), klass);
             }
         }
 
-        static public function start(online:Boolean, gameStateClass:Class, clientLogic:IClient, tickRate:TickRate, log:Function=null) :void
+        static public function start(
+            online:Boolean,
+            modelClass:Class,
+            controllerClass:Class,
+            viewInstance:IGameView,
+            tickRate:TickRate,
+            log:Function=null
+        ) :void
         {
             if (s_runner !== null) {
                 throw new Error ("NetGame has already been started");
@@ -34,7 +36,7 @@ package net.jaburns.airp2p
                 s_runner = new OfflineGameRunner;
             }
 
-            s_runner.start(gameStateClass, clientLogic, tickRate, log);
+            s_runner.start(modelClass, controllerClass, viewInstance, tickRate, log);
         }
 
         static public function stop() :void
