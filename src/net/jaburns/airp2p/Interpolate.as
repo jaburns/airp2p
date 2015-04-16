@@ -16,7 +16,7 @@ package net.jaburns.airp2p
             return ret;
         }
 
-        static public function preserveType(t:Number, a:Object, b:Object, fieldPaths:Vector.<Vector.<String>>) :Object
+        static public function typedObject(t:Number, a:Object, b:Object, fieldPaths:Vector.<Vector.<String>>) :Object
         {
             if (t < 0) t = 0;
 
@@ -26,13 +26,13 @@ package net.jaburns.airp2p
             var ret:Object = ba.readObject();
 
             for each (var path:Vector.<String> in fieldPaths) {
-                _preserveType(t, a, b, ret, path.slice());
+                _typedObject(t, a, b, ret, path.slice());
             }
 
             return ret;
         }
 
-        static private function _preserveType(t:Number, a:Object, b:Object, ret:Object, path:Vector.<String>) :void
+        static private function _typedObject(t:Number, a:Object, b:Object, ret:Object, path:Vector.<String>) :void
         {
             if (a === null || b === null) return;
 
@@ -44,7 +44,7 @@ package net.jaburns.airp2p
 
                     if (typeName.substr(0, 19) == "__AS3__.vec::Vector" ||  typeName === "Array" ||  typeName === "Object") {
                         for (var k:* in a) {
-                            _preserveType(t, a[k], b[k], ret[k], path);
+                            _typedObject(t, a[k], b[k], ret[k], path);
                         }
                         return;
                     }
@@ -55,10 +55,10 @@ package net.jaburns.airp2p
                 ret = ret[pathItem];
             }
 
-            ret[path[0]] = interpolateNumber(t, a[path[0]], b[path[0]]);
+            ret[path[0]] = number(t, a[path[0]], b[path[0]]);
         }
 
-        static private function interpolateNumber(t:Number, a:Number, b:Number) :Number
+        static public function number(t:Number, a:Number, b:Number) :Number
         {
             return a + (b-a)*t;
         }

@@ -17,12 +17,12 @@ package net.jaburns.airp2p
         }
 
         static public function start(
-            online:Boolean,
-            modelClass:Class,
-            controllerClass:Class,
-            viewInstance:IGameView,
-            tickRate:TickRate,
-            log:Function=null
+            online :Boolean,
+            modelClass :Class,
+            controller :IGameController,
+            view :IGameView,
+            tickRate :TickRate,
+            log :Function=null
         ) :void
         {
             if (s_runner !== null) {
@@ -36,7 +36,7 @@ package net.jaburns.airp2p
                 s_runner = new OfflineGameRunner;
             }
 
-            s_runner.start(modelClass, controllerClass, viewInstance, tickRate, log);
+            s_runner.start(modelClass, controller, view, tickRate, log);
         }
 
         static public function stop() :void

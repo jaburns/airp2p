@@ -5,7 +5,6 @@ package net.jaburns.airp2p
     internal class OfflineGameRunner implements IGameRunner
     {
         private var _modelClass :Class;
-        private var _controllerClass :Class;
 
         private var _model :Object;
         private var _view :IGameView;
@@ -16,18 +15,17 @@ package net.jaburns.airp2p
 
         public function start(
             modelClass:Class,
-            controllerClass:Class,
-            viewInstance:IGameView,
+            controller:IGameController,
+            view:IGameView,
             tickRate:TickRate,
             log:Function=null
         ):void
         {
             _modelClass = modelClass;
-            _controllerClass = controllerClass;
-            _view = viewInstance;
+            _view = view;
 
             _model = new _modelClass;
-            _controller = new _controllerClass;
+            _controller = controller;
 
             if (log !== null) {
                 _log = function(msg:String) :void {

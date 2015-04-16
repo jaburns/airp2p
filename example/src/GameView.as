@@ -6,11 +6,11 @@ package
     import flash.utils.getTimer;
 
     import model.GameState;
+    import model.InputState;
     import model.PlayerState;
 
     import net.jaburns.airp2p.IGameView;
     import net.jaburns.airp2p.Interpolate;
-    import model.InputState;
 
     public class GameView implements IGameView
     {
@@ -82,7 +82,7 @@ package
 
             var t:Number = (Number(getTimer()) - _stateArriveTime) / Main.TICK_LENGTH;
 
-            _interState = Interpolate.preserveType(
+            _interState = Interpolate.typedObject(
                 t, _prevState, _thisState, GameState.interpolationPaths
             ) as GameState;
 

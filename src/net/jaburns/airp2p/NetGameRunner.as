@@ -13,7 +13,6 @@ package net.jaburns.airp2p
         static private const SOCKET_PORT :int = 30322;
 
         private var _modelClass :Class;
-        private var _controllerClass :Class;
 
         private var _model :Object;
         private var _view :IGameView;
@@ -37,11 +36,11 @@ package net.jaburns.airp2p
 
 
         public function start(
-            modelClass:Class,
-            controllerClass:Class,
-            viewInstance:IGameView,
-            tickRate:TickRate,
-            log:Function=null
+            modelClass :Class,
+            controller :IGameController,
+            viewInstance :IGameView,
+            tickRate :TickRate,
+            log :Function=null
         ):void
         {
             if (log !== null) {
@@ -56,8 +55,8 @@ package net.jaburns.airp2p
             _timer.addEventListener(TickTimer.TICK, timer_tick);
 
             _modelClass = modelClass;
-            _controllerClass = controllerClass;
 
+            _controller = controller;
             _model = new _modelClass;
             _view = viewInstance;
 
@@ -102,10 +101,6 @@ package net.jaburns.airp2p
             _hosting = e.ip === _peers.localIP;
             _freshInputs = true;
             _inputs = {};
-
-            if (_hosting && _controller === null) {
-                _controller = new _controllerClass;
-            }
 
             _log("Host determined. Starting updates.");
             notifyClientConnected(true);

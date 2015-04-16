@@ -36,7 +36,14 @@ package
                 GameState,
                 PlayerState
             );
-            NetGame.start(true, GameState, GameController, new GameView(this), TickRate.timer(TICK_LENGTH), log);
+
+            NetGame.start(true,
+                GameState,
+                new GameController,
+                new GameView(this),
+                TickRate.timer(TICK_LENGTH),
+                log
+            );
         }
 
         private function log(msg:String) :void
